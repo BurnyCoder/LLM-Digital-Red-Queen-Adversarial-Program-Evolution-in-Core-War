@@ -1,0 +1,6 @@
+
+ORG start
+start   JMP 2    ; loop: ping-pongs between line 4 and this start line
+        NOP       ; harmless filler (not executed in the loop)
+        JMP -2      ; return to start, forming a tiny beacon
+END
