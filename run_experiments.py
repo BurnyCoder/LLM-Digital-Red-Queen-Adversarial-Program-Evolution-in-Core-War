@@ -345,7 +345,7 @@ def main():
     # Common arguments
     parser.add_argument("--seed", "-s", type=int, default=0, help="Random seed")
     parser.add_argument("--n_processes", "-p", type=int, default=20, help="Number of parallel processes")
-    parser.add_argument("--model", default="gpt-4.1-mini-2025-04-14", help="LLM model to use")
+    parser.add_argument("--model", default=os.environ.get("DRQ_MODEL", "gpt-5-nano"), help="LLM model to use")
     parser.add_argument("--temperature", type=float, default=1.0, help="LLM temperature")
     parser.add_argument("--save_dir", help="Directory to save results")
     parser.add_argument("--job_timeout", type=int, default=36000, help="Job timeout in seconds")

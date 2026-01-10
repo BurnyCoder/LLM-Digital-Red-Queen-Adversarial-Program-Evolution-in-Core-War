@@ -26,6 +26,8 @@ AVAILABLE_LLMS = [
     "gpt-4.1-mini-2025-04-14",
     "gpt-4.1-nano",
     "gpt-4.1-nano-2025-04-14",
+    "gpt-5-nano",
+    "gpt-5-nano-2025-08-07",
     "o1",
     "o1-2024-12-17",
     "o1-preview-2024-09-12",

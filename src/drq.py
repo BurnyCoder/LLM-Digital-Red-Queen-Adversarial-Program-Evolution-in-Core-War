@@ -51,7 +51,7 @@ class Args:
     single_cell: bool | None = False # for testing: only use one cell in map elites
 
     # LLM arguments
-    gpt_model: str = "gpt-4.1-mini-2025-04-14" # The GPT model to use
+    gpt_model: str = os.environ.get("DRQ_MODEL", "gpt-5-nano") # The GPT model to use
     temperature: float = 1.0
     system_prompt: str = os.path.expanduser("./prompts/system_prompt_0.txt")
     new_prompt: str = os.path.expanduser("./prompts/new_prompt_0.txt")
