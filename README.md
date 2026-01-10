@@ -55,21 +55,13 @@ Prompts:
 To run this project locally, you can start by cloning this repo.
 ```sh
 git clone https://github.com/SakanaAI/drq.git
-```
-Then, set up the python environment with conda:
-```sh
-conda create --name drq python=3.12.3
-conda activate drq
+cd drq
 ```
 
-Then, install the necessary python libraries:
+Then, install dependencies using `uv` and the local corewar package:
 ```sh
-python -m pip install -r requirements.txt
-```
-
-Also go ahead and install the corewar library that exists within this repository:
-```sh
-python -m pip install -e corewar
+uv pip install -r requirements.txt
+uv pip install -e corewar
 ```
 
 ## Quick Start: Experiment Runner
