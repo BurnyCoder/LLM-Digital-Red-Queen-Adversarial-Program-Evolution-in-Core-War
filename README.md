@@ -72,6 +72,50 @@ Also go ahead and install the corewar library that exists within this repository
 python -m pip install -e corewar
 ```
 
+## Quick Start: Experiment Runner
+
+Use `run_experiments.py` to easily run all paper experiments:
+
+```bash
+# Smoke test (~30 sec) - verify setup works
+python run_experiments.py --mode smoke_test
+
+# Quick test (~5 min)
+python run_experiments.py --mode quick_test
+
+# Full DRQ replication (Section 4.2) - takes hours
+python run_experiments.py --mode full_drq --seed 0
+
+# Static optimization (Section 4.1)
+python run_experiments.py --mode static_opt --initial_opponent human_warriors/imp.red
+
+# History ablation experiments (K=1, K=3)
+python run_experiments.py --mode ablation_k1
+python run_experiments.py --mode ablation_k3
+
+# MAP-Elites ablation (Section 4.5)
+python run_experiments.py --mode no_map_elites
+
+# Evaluate a warrior against human opponents
+python run_experiments.py --mode eval --warrior_path results/full_drq/seed0/round_019_champion.red
+
+# Visualize a battle
+python run_experiments.py --mode visualize --warriors human_warriors/imp.red human_warriors/dwarf.red
+
+# Batch: run against all human warriors
+python run_experiments.py --mode batch_static
+```
+
+**Common options:**
+| Option | Description |
+|--------|-------------|
+| `--seed N` | Random seed (default: 0) |
+| `--n_processes N` | Parallel workers (default: 20) |
+| `--save_dir PATH` | Output directory |
+| `--model NAME` | LLM model (default: gpt-4.1-mini-2025-04-14) |
+
+Run `python run_experiments.py --help` for all options.
+
 ## Starting Code
 ### Code to run battle between warriors
 
