@@ -23,10 +23,10 @@ class GPTWarrior:
 
 
 class CorewarGPT():
-    def __init__(self, model, system_prompt, new_warrior_prompt, mutate_warrior_prompt, temperature=1., environment=None):
+    def __init__(self, model, system_prompt, new_warrior_prompt, mutate_warrior_prompt, temperature=1., environment=None, reasoning_effort=None):
         self.new_warrior_prompt = new_warrior_prompt
         self.mutate_warrior_prompt = mutate_warrior_prompt
-        self.gpt = GPT(model=model, system_prompt=system_prompt, temperature=temperature)
+        self.gpt = GPT(model=model, system_prompt=system_prompt, temperature=temperature, reasoning_effort=reasoning_effort)
         self.environment = environment
         self.all_generations = [] # list of tuples of (generation_type, gpt_warriors)
 

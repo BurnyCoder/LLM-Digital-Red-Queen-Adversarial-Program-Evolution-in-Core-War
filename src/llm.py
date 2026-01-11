@@ -28,6 +28,8 @@ AVAILABLE_LLMS = [
     "gpt-4.1-nano-2025-04-14",
     "gpt-5-nano",
     "gpt-5-nano-2025-08-07",
+    "gpt-5-mini",
+    "gpt-5.2",
     "o1",
     "o1-2024-12-17",
     "o1-preview-2024-09-12",
@@ -64,6 +66,11 @@ AVAILABLE_LLMS = [
 ]
 
 
+def is_reasoning_model(model):
+    """Check if model supports reasoning effort parameter (GPT-5 family models)."""
+    return any(x in model for x in ["gpt-5-mini", "gpt-5.2", "gpt-5.1", "gpt-5"])
+
+
 # Get N responses from a single message, used for ensembling.
 @backoff.on_exception(backoff.expo, (openai.RateLimitError, openai.APITimeoutError))
 def get_batch_responses_from_llm(
@@ -75,24 +82,30 @@ def get_batch_responses_from_llm(
         msg_history=None,
         temperature=0.75,
         n_responses=1,
+        reasoning_effort=None,
 ):
     if msg_history is None:
         msg_history = []
 
     if 'gpt' in model:
         new_msg_history = msg_history + [{"role": "user", "content": msg}]
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
+        # Build kwargs for API call
+        kwargs = {
+            "model": model,
+            "messages": [
                 {"role": "system", "content": system_message},
                 *new_msg_history,
             ],
-            temperature=temperature,
-            max_tokens=MAX_NUM_TOKENS,
-            n=n_responses,
-            stop=None,
-            seed=0,
-        )
+            "temperature": temperature,
+            "max_tokens": MAX_NUM_TOKENS,
+            "n": n_responses,
+            "stop": None,
+            "seed": 0,
+        }
+        # Add reasoning parameter for GPT-5 family models
+        if is_reasoning_model(model) and reasoning_effort:
+            kwargs["reasoning"] = {"effort": reasoning_effort}
+        response = client.chat.completions.create(**kwargs)
         content = [r.message.content for r in response.choices]
         new_msg_history = [
             new_msg_history + [{"role": "assistant", "content": c}] for c in content
@@ -150,6 +163,7 @@ def get_response_from_llm(
         print_debug=False,
         msg_history=None,
         temperature=0.75,
+        reasoning_effort=None,
 ):
     if msg_history is None:
         msg_history = []
@@ -187,18 +201,23 @@ def get_response_from_llm(
         ]
     elif 'gpt' in model:
         new_msg_history = msg_history + [{"role": "user", "content": msg}]
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
+        # Build kwargs for API call
+        kwargs = {
+            "model": model,
+            "messages": [
                 {"role": "system", "content": system_message},
                 *new_msg_history,
             ],
-            temperature=temperature,
-            max_tokens=MAX_NUM_TOKENS,
-            n=1,
-            stop=None,
-            seed=0,
-        )
+            "temperature": temperature,
+            "max_tokens": MAX_NUM_TOKENS,
+            "n": 1,
+            "stop": None,
+            "seed": 0,
+        }
+        # Add reasoning parameter for GPT-5 family models
+        if is_reasoning_model(model) and reasoning_effort:
+            kwargs["reasoning"] = {"effort": reasoning_effort}
+        response = client.chat.completions.create(**kwargs)
         content = response.choices[0].message.content
         new_msg_history = new_msg_history + [{"role": "assistant", "content": content}]
     elif "o1" in model or "o3" in model:

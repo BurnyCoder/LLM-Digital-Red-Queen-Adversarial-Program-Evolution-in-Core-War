@@ -251,7 +251,7 @@ def check_setup():
 
 def get_base_drq_args(args):
     """Get base arguments common to all DRQ runs."""
-    return [
+    base_args = [
         f"--seed={args.seed}",
         f"--n_processes={args.n_processes}",
         f"--gpt_model={args.model}",
@@ -271,6 +271,10 @@ def get_base_drq_args(args):
         "--fitness_threshold=0.8",
         "--sample_new_percent=0.1",
     ]
+    # Add reasoning_effort if specified
+    if args.reasoning_effort:
+        base_args.append(f"--reasoning_effort={args.reasoning_effort}")
+    return base_args
 
 
 def run_smoke_test(args):
@@ -540,8 +544,11 @@ def main():
     # Common arguments
     parser.add_argument("--seed", "-s", type=int, default=0, help="Random seed")
     parser.add_argument("--n_processes", "-p", type=int, default=20, help="Number of parallel processes")
-    parser.add_argument("--model", default=os.environ.get("DRQ_MODEL", "gpt-5-nano"), help="LLM model to use")
+    parser.add_argument("--model", default=os.environ.get("DRQ_MODEL", "gpt-5-nano"), help="LLM model to use (env: DRQ_MODEL)")
     parser.add_argument("--temperature", type=float, default=1.0, help="LLM temperature")
+    parser.add_argument("--reasoning_effort", default=os.environ.get("DRQ_REASONING_EFFORT"),
+                        choices=["none", "minimal", "low", "medium", "high", "xhigh"],
+                        help="Reasoning effort level for GPT-5 models (env: DRQ_REASONING_EFFORT)")
     parser.add_argument("--save_dir", help="Directory to save results")
     parser.add_argument("--job_timeout", type=int, default=36000, help="Job timeout in seconds")
 

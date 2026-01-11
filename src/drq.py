@@ -53,6 +53,7 @@ class Args:
     # LLM arguments
     gpt_model: str = os.environ.get("DRQ_MODEL", "gpt-5-nano") # The GPT model to use
     temperature: float = 1.0
+    reasoning_effort: str | None = os.environ.get("DRQ_REASONING_EFFORT", None)  # none, minimal, low, medium, high, xhigh (for GPT-5 models)
     system_prompt: str = os.path.expanduser("./prompts/system_prompt_0.txt")
     new_prompt: str = os.path.expanduser("./prompts/new_prompt_0.txt")
     mutate_prompt: str = os.path.expanduser("./prompts/mutate_prompt_0.txt")
@@ -110,7 +111,8 @@ class Main:
             # task_crossover_warrior = f.read()
 
         self.corewar_gpt = CorewarGPT(args.gpt_model, system_prompt, new_warrior_prompt, mutate_warrior_prompt,
-                                      temperature=args.temperature, environment=simargs_to_environment(args.simargs))
+                                      temperature=args.temperature, environment=simargs_to_environment(args.simargs),
+                                      reasoning_effort=args.reasoning_effort)
 
         self.init_opps = []
         for file in args.initial_opps:

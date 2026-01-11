@@ -9,27 +9,39 @@ import backoff
 
 # MAX_NUM_TOKENS = 4096
 
+
+def is_reasoning_model(model):
+    """Check if model supports reasoning effort parameter (GPT-5 family models)."""
+    return any(x in model for x in ["gpt-5-mini", "gpt-5.2", "gpt-5.1", "gpt-5"])
+
+
 class GPT:
-    def __init__(self, model, system_prompt, temperature=1.):
+    def __init__(self, model, system_prompt, temperature=1., reasoning_effort=None):
         self.model = model
         self.system_prompt = system_prompt
         self.temperature = temperature
+        self.reasoning_effort = reasoning_effort
         self.client = AsyncOpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
     @backoff.on_exception(backoff.expo, (openai.RateLimitError, openai.APITimeoutError, openai.PermissionDeniedError))
     async def get_completion_async(self, prompt, n_responses=1):
-        response = await self.client.chat.completions.create(
-            model=self.model,
-            messages=[
+        # Build kwargs for API call
+        kwargs = {
+            "model": self.model,
+            "messages": [
                 {"role": "system", "content": self.system_prompt},
                 {"role": "user", "content": prompt},
             ],
-            temperature=self.temperature,
+            "temperature": self.temperature,
             # max_tokens=MAX_NUM_TOKENS,
-            n=n_responses,
-            stop=None,
-            seed=0,
-        )
+            "n": n_responses,
+            "stop": None,
+            "seed": 0,
+        }
+        # Add reasoning parameter for GPT-5 family models
+        if is_reasoning_model(self.model) and self.reasoning_effort:
+            kwargs["reasoning"] = {"effort": self.reasoning_effort}
+        response = await self.client.chat.completions.create(**kwargs)
         return [r.message.content for r in response.choices]
 
     async def get_multiple_completions_async(self, prompts, n_responses=1):

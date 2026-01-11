@@ -104,7 +104,45 @@ python run_experiments.py --mode batch_static
 | `--seed N` | Random seed (default: 0) |
 | `--n_processes N` | Parallel workers (default: 20) |
 | `--save_dir PATH` | Output directory |
-| `--model NAME` | LLM model (default: gpt-4.1-mini-2025-04-14) |
+| `--model NAME` | LLM model (default: gpt-5-nano) |
+| `--reasoning_effort LEVEL` | Reasoning effort for GPT-5 models |
+
+**Supported models:**
+| Provider | Models |
+|----------|--------|
+| OpenAI GPT-5 | `gpt-5-nano`, `gpt-5-mini`, `gpt-5.2` |
+| OpenAI GPT-4 | `gpt-4o`, `gpt-4o-mini`, `gpt-4.1`, `gpt-4.1-mini`, `gpt-4.1-nano` |
+| OpenAI Reasoning | `o1`, `o1-mini`, `o3-mini` |
+| Anthropic | `claude-3-5-sonnet-20240620`, `claude-3-5-sonnet-20241022` |
+| Google | `gemini-2.0-flash`, `gemini-2.5-pro-preview-03-25` |
+| DeepSeek | `deepseek-chat`, `deepseek-coder`, `deepseek-reasoner` |
+
+**Reasoning effort levels** (for GPT-5 family models):
+| Level | Description |
+|-------|-------------|
+| `none` | No reasoning tokens (fastest, default for GPT-5.2) |
+| `minimal` | Very few reasoning tokens |
+| `low` | Basic reasoning |
+| `medium` | Balanced (default for GPT-5) |
+| `high` | Deeper reasoning |
+| `xhigh` | Maximum reasoning (GPT-5.2 only) |
+
+**Environment variables:**
+| Variable | Description |
+|----------|-------------|
+| `DRQ_MODEL` | Default LLM model (overridden by `--model`) |
+| `DRQ_REASONING_EFFORT` | Default reasoning effort level (overridden by `--reasoning_effort`) |
+
+Example with GPT-5.2 and high reasoning:
+```bash
+# Via environment variables
+export DRQ_MODEL=gpt-5.2
+export DRQ_REASONING_EFFORT=high
+python run_experiments.py --mode smoke_test
+
+# Via CLI arguments
+python run_experiments.py --mode smoke_test --model gpt-5-mini --reasoning_effort medium
+```
 
 Run `python run_experiments.py --help` for all options.
 
@@ -150,7 +188,8 @@ with open(new_warrior_prompt, "r") as f:
 with open(mutate_warrior_prompt, "r") as f:
     mutate_warrior_prompt = f.read()
 
-gpt = CorewarGPT("gpt-4.1-mini-2025-04-14", system_prompt, new_warrior_prompt, mutate_warrior_prompt, temperature=1., environment=simargs_to_environment(simargs))
+gpt = CorewarGPT("gpt-5-mini", system_prompt, new_warrior_prompt, mutate_warrior_prompt,
+                 temperature=1., environment=simargs_to_environment(simargs), reasoning_effort="medium")
 
 new_warriors = asyncio.run(gpt.new_warrior_async(n_warriors=1, n_responses=8)).flatten() # get 8 new warriors
 new_warriors = [w for w in new_warriors if w is not None and w.warrior is not None]
@@ -216,7 +255,19 @@ Here is how to run the full DRQ algorithm:
 ```bash
 cd src
 
-python drq.py --seed=0 --save_dir="./drq_run_0/drq_seed=0"              --n_processes=20 --resume=True --job_timeout=36000 --simargs.rounds=20 --simargs.size=8000 --simargs.cycles=80000 --simargs.processes=8000 --simargs.length=100 --simargs.distance=100 --timeout=900 --initial_opps "../human_warriors/imp.red"              --n_rounds=20 --n_iters=250 --log_every=20 --last_k_opps=20 --sample_new_percent=0.1 --bc_axes="tsp,mc" --warmup_with_init_opps=True --warmup_with_past_champs=True --n_init=8 --n_mutate=1 --fitness_threshold=0.8 --single_cell=False --gpt_model="gpt-4.1-mini-2025-04-14" --temperature=1.0 --system_prompt="./prompts/system_prompt_0.txt" --new_prompt="./prompts/new_prompt_0.txt" --mutate_prompt="./prompts/mutate_prompt_0.txt"
+python drq.py --seed=0 --save_dir="./drq_run_0/drq_seed=0" \
+  --n_processes=20 --resume=True --job_timeout=36000 \
+  --simargs.rounds=20 --simargs.size=8000 --simargs.cycles=80000 \
+  --simargs.processes=8000 --simargs.length=100 --simargs.distance=100 \
+  --timeout=900 --initial_opps "../human_warriors/imp.red" \
+  --n_rounds=20 --n_iters=250 --log_every=20 --last_k_opps=20 \
+  --sample_new_percent=0.1 --bc_axes="tsp,mc" \
+  --warmup_with_init_opps=True --warmup_with_past_champs=True \
+  --n_init=8 --n_mutate=1 --fitness_threshold=0.8 --single_cell=False \
+  --gpt_model="gpt-5-mini" --temperature=1.0 --reasoning_effort="medium" \
+  --system_prompt="./prompts/system_prompt_0.txt" \
+  --new_prompt="./prompts/new_prompt_0.txt" \
+  --mutate_prompt="./prompts/mutate_prompt_0.txt"
 ```
 
 ### Our Dataset of Discovered Warriors
