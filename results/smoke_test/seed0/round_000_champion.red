@@ -1,6 +1,10 @@
 
+; A playful ring-bomb updated: insert a NOP between SPL and DAT to space out clones
+; Slightly increases spacing between spawned tasks, which can improve survival
+; against some opponents by avoiding synchronized deaths.
 ORG start
-start   JMP 2    ; loop: ping-pongs between line 4 and this start line
-        NOP       ; harmless filler (not executed in the loop)
-        JMP -2      ; return to start, forming a tiny beacon
-END
+start   SPL   #2, #0   ; spawn a new task and continue
+        NOP             ; spacer to diversify timing between tasks
+        DAT   #0, #0     ; current task dies
+        JMP   start       ; loop to continually spawn more
+END start

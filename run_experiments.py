@@ -25,6 +25,7 @@ import argparse
 import subprocess
 import sys
 import os
+import pickle
 from pathlib import Path
 from glob import glob
 
@@ -33,6 +34,200 @@ PROJECT_ROOT = Path(__file__).parent.absolute()
 SRC_DIR = PROJECT_ROOT / "src"
 HUMAN_WARRIORS_DIR = PROJECT_ROOT / "human_warriors"
 COREWAR_DIR = PROJECT_ROOT / "corewar"
+RESULTS_DIR = PROJECT_ROOT / "results"
+
+
+def _setup_pickle_imports():
+    """Setup imports needed for unpickling result files.
+
+    Returns imported classes that need to be added to caller's globals.
+    """
+    # Add project paths
+    if str(SRC_DIR) not in sys.path:
+        sys.path.insert(0, str(SRC_DIR))
+    if str(PROJECT_ROOT) not in sys.path:
+        sys.path.insert(0, str(PROJECT_ROOT))
+
+    # Patch corewar imports (local corewar folder shadows the pip package)
+    from corewar.corewar import MARS, Core, Warrior, redcode
+    import corewar
+    corewar.MARS = MARS
+    corewar.Core = Core
+    corewar.Warrior = Warrior
+    corewar.redcode = redcode
+
+    # Import classes needed for unpickling and inject into __main__
+    from llm_corewar import GPTWarrior
+    from drq import MapElites, Args
+    from corewar_util import SimulationArgs
+
+    # Inject into __main__ so pickle can find them
+    import __main__
+    __main__.GPTWarrior = GPTWarrior
+    __main__.MapElites = MapElites
+    __main__.Args = Args
+    __main__.SimulationArgs = SimulationArgs
+
+
+def format_warrior(w, indent=""):
+    """Format all attributes of a GPTWarrior as a string."""
+    lines = []
+    lines.append(f"{indent}id: {w.id}")
+    lines.append(f"{indent}parent_id: {w.parent_id}")
+    lines.append(f"{indent}fitness: {w.fitness}")
+    lines.append(f"{indent}bc: {w.bc}")
+    if w.error:
+        lines.append(f"{indent}error: {w.error}")
+    if w.outputs:
+        lines.append(f"{indent}outputs: {w.outputs}")
+    if w.full_outputs:
+        lines.append(f"{indent}full_outputs: {w.full_outputs}")
+    lines.append(f"{indent}prompt:")
+    for line in w.prompt.strip().split('\n'):
+        lines.append(f"{indent}  {line}")
+    lines.append(f"{indent}llm_response:")
+    for line in w.llm_response.strip().split('\n'):
+        lines.append(f"{indent}  {line}")
+    if w.warrior:
+        lines.append(f"{indent}warrior.name: {w.warrior.name}")
+        lines.append(f"{indent}warrior.author: {w.warrior.author}")
+        lines.append(f"{indent}warrior.start: {w.warrior.start}")
+        lines.append(f"{indent}warrior.instructions: ({len(w.warrior.instructions)})")
+        for idx, instr in enumerate(w.warrior.instructions):
+            lines.append(f"{indent}  [{idx}] {instr}")
+    return '\n'.join(lines)
+
+
+def print_results_summary(results_dir):
+    """Print summary of experiment results and save to readable/ subfolder."""
+    results_dir = Path(results_dir)
+    if not results_dir.exists():
+        print(f"Results directory not found: {results_dir}")
+        return
+
+    # Setup imports needed for unpickling
+    _setup_pickle_imports()
+
+    readable_dir = results_dir / 'readable'
+    readable_dir.mkdir(exist_ok=True)
+
+    print("\n" + "=" * 60)
+    print(f"Results: {results_dir}")
+    print(f"Saving to: {readable_dir}")
+    print("=" * 60)
+
+    # Args
+    args_file = results_dir / 'args.pkl'
+    if args_file.exists():
+        with open(args_file, 'rb') as f:
+            exp_args = pickle.load(f)
+        lines = ["[Args]", ""]
+        for key, val in vars(exp_args).items():
+            if hasattr(val, '__dict__'):
+                lines.append(f"{key}:")
+                for k2, v2 in vars(val).items():
+                    lines.append(f"  {k2}: {v2}")
+            else:
+                lines.append(f"{key}: {val}")
+        content = '\n'.join(lines)
+        print(f"\n{content}")
+        (readable_dir / 'args.txt').write_text(content)
+
+    # MAP-Elites
+    me_file = results_dir / 'all_rounds_map_elites.pkl'
+    if me_file.exists():
+        with open(me_file, 'rb') as f:
+            map_elites = pickle.load(f)
+        lines = ["[MAP-Elites Archive]", ""]
+        for round_num, me in map_elites.items():
+            best = me.get_best()
+            lines.append(f"Round {round_num}:")
+            lines.append(f"  Archive cells: {len(me.archive)}")
+            lines.append(f"  Fitness history: {me.fitness_history}")
+            if best:
+                lines.append(f"  Best fitness: {best.fitness:.4f}")
+                lines.append(f"  Best BC: {best.bc}")
+            lines.append(f"\n  All entries:")
+            for bc, warrior in me.archive.items():
+                lines.append(f"\n    --- BC {bc} ---")
+                lines.append(format_warrior(warrior, indent="    "))
+        content = '\n'.join(lines)
+        print(f"\n{content}")
+        (readable_dir / 'map_elites.txt').write_text(content)
+
+    # Generations
+    gen_file = results_dir / 'all_generations.pkl'
+    if gen_file.exists():
+        with open(gen_file, 'rb') as f:
+            generations = pickle.load(f)
+        lines = ["[Generations]", ""]
+        for gen_idx, (op_type, batches) in enumerate(generations):
+            total_warriors = sum(len(batch) for batch in batches)
+            lines.append(f"\nGen {gen_idx} ({op_type}): {total_warriors} warriors")
+            for batch_idx, batch in enumerate(batches):
+                for w_idx, w in enumerate(batch):
+                    lines.append(f"\n  --- Warrior {batch_idx}.{w_idx} ---")
+                    lines.append(format_warrior(w, indent="  "))
+        content = '\n'.join(lines)
+        print(f"\n{content}")
+        (readable_dir / 'generations.txt').write_text(content)
+
+    # Timestamps
+    ts_file = results_dir / 'timestamps.pkl'
+    if ts_file.exists():
+        with open(ts_file, 'rb') as f:
+            timestamps = pickle.load(f)
+        total_time = sum(t['dt'] for t in timestamps)
+        lines = ["[Timestamps]", ""]
+        lines.append(f"Total iterations: {len(timestamps)}")
+        lines.append(f"Total time: {total_time:.2f}s")
+        lines.append(f"\nAll entries:")
+        for ts in timestamps:
+            lines.append(f"  abs_iter={ts['abs_iter']}, round={ts['i_round']}, iter={ts['i_iter']}")
+            lines.append(f"    dt={ts['dt']:.4f}s, rss={ts['rss']/1024/1024:.1f}MB, vms={ts['vms']/1024/1024:.1f}MB")
+        content = '\n'.join(lines)
+        print(f"\n{content}")
+        (readable_dir / 'timestamps.txt').write_text(content)
+
+    # Champion files
+    champions = list(results_dir.glob('*_champion.red'))
+    if champions:
+        lines = ["[Champions]", ""]
+        for champ in sorted(champions):
+            lines.append(f"\n--- {champ.name} ---")
+            for line in champ.read_text().strip().split('\n'):
+                lines.append(line)
+        content = '\n'.join(lines)
+        print(f"\n{content}")
+        (readable_dir / 'champions.txt').write_text(content)
+
+    print(f"\n{'=' * 60}")
+    print(f"Saved readable files to: {readable_dir}")
+    print(f"{'=' * 60}")
+
+
+def get_results_dir(mode, seed, save_dir=None, initial_opponent=None):
+    """Get the results directory for a given mode and seed."""
+    if save_dir:
+        return Path(save_dir)
+
+    if mode == "static_opt":
+        opp_name = Path(initial_opponent).stem if initial_opponent else "imp"
+        return RESULTS_DIR / "static_opt" / f"{opp_name}_seed{seed}"
+
+    mode_dirs = {
+        "smoke_test": "smoke_test",
+        "quick_test": "quick_test",
+        "full_drq": "full_drq",
+        "ablation_k1": "ablation_k1",
+        "ablation_k3": "ablation_k3",
+        "no_map_elites": "no_map_elites",
+    }
+
+    if mode in mode_dirs:
+        return RESULTS_DIR / mode_dirs[mode] / f"seed{seed}"
+
+    return None
 
 
 def check_setup():
@@ -388,6 +583,11 @@ def main():
 
     if result and result.returncode != 0:
         sys.exit(result.returncode)
+
+    # Print results summary for modes that produce results
+    results_dir = get_results_dir(args.mode, args.seed, args.save_dir, args.initial_opponent)
+    if results_dir and results_dir.exists():
+        print_results_summary(results_dir)
 
 
 if __name__ == "__main__":

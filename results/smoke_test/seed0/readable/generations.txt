@@ -4,81 +4,94 @@
 Gen 0 (new_warrior): 2 warriors
 
   --- Warrior 0.0 ---
-  id: 14a22cf874dabd185ac265a3695adf699fbb4217b6373a74153386a8ffea40fe
+  id: c6e366ff3aa2518f2fad9581bb956ffa8c196e57b1ab422f4ed68a173f065024
   parent_id: None
   fitness: -inf
   bc: None
   prompt:
     Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
   llm_response:
-    ```redcode
-    ORG     start
-    start   EQU     4
-    
-            NOP     ; heartbeat: cycle through memory with a tiny loop
-            JMP    -1  ; loop back to the NOP, creating a small heartbeat
-    END
     ```
-  warrior.name: Unnamed
-  warrior.author: Anonymous
-  warrior.start: 4
-  warrior.instructions: (2)
-    [0] NOP.F  $     0, $     0
-    [1] JMP.B  $    -1, $     0
-
-  --- Warrior 0.1 ---
-  id: 1e42960a89cd5dca8b37d70d4f439b3aeeb6e0734d755664fb12d2c26c6140f8
-  parent_id: None
-  fitness: -inf
-  bc: None
-  prompt:
-    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
-  llm_response:
-    ```redcode
-    ORG start
-    start   JMP 2    ; loop: ping-pongs between line 4 and this start line
-            NOP       ; harmless filler (not executed in the loop)
-            JMP -2      ; return to start, forming a tiny beacon
+            ORG     start
+    start   SPL     #2       ; spawn a clone two lines ahead
+            MOV     #0, target; set the target's B-field to 0
+            JMP     start      ; loop to keep executing
+    target  DAT     #0, #0     ; a mutable destination to be touched
     END
     ```
   warrior.name: Unnamed
   warrior.author: Anonymous
   warrior.start: 0
+  warrior.instructions: (4)
+    [0] SPL.B  #     2, $     0
+    [1] MOV.AB #     0, $     2
+    [2] JMP.B  $    -2, $     0
+    [3] DAT.F  #     0, #     0
+
+  --- Warrior 0.1 ---
+  id: d861d311d29598b986a6ea84d088994f442cc79242a8197a211553fad6c537d7
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```
+    ; A playful ring-bomb that continuously spawns new tasks to chase the start label.
+    ; The original task splits, then dies at the DAT; the spawned task jumps back to start
+    ; and repeats, creating a growing ring of processes.
+    ORG start
+    start   SPL   #2, #0
+            DAT   #0, #0
+            JMP   start
+    END start
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
   warrior.instructions: (3)
-    [0] JMP.B  $     2, $     0
-    [1] NOP.F  $     0, $     0
+    [0] SPL.B  #     2, #     0
+    [1] DAT.F  #     0, #     0
     [2] JMP.B  $    -2, $     0
 
 Gen 1 (mutate_warrior): 1 warriors
 
   --- Warrior 0.0 ---
-  id: 093db3b7f38ae40ad3c887c997cf3a7afb8b9f712f3e259b21fba423a4ce9747
-  parent_id: 1e42960a89cd5dca8b37d70d4f439b3aeeb6e0734d755664fb12d2c26c6140f8
+  id: eb040e25eb06f4b0d0845a186ce07378bbf5b5ef92d5ceda4ad86ddb2dd97fcd
+  parent_id: d861d311d29598b986a6ea84d088994f442cc79242a8197a211553fad6c537d7
   fitness: -inf
   bc: None
   prompt:
     Mutate (change) the following Core War program in a way that is likely to improve its performance (survive and kill other programs). Write only the new updated program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
     
     
-    ```redcode
+    ```
+    ; A playful ring-bomb that continuously spawns new tasks to chase the start label.
+    ; The original task splits, then dies at the DAT; the spawned task jumps back to start
+    ; and repeats, creating a growing ring of processes.
     ORG start
-    start   JMP 2    ; loop: ping-pongs between line 4 and this start line
-            NOP       ; harmless filler (not executed in the loop)
-            JMP -2      ; return to start, forming a tiny beacon
-    END
+    start   SPL   #2, #0
+            DAT   #0, #0
+            JMP   start
+    END start
     ```
   llm_response:
-    ```redcode
+    ```
+    ; A playful ring-bomb updated: insert a NOP between SPL and DAT to space out clones
+    ; Slightly increases spacing between spawned tasks, which can improve survival
+    ; against some opponents by avoiding synchronized deaths.
     ORG start
-    start   SPL 2        ; fork a new process to increase odds of surviving and killing
-            JMP -1         ; loop to keep spawning and circling
-            DAT 0,0        ; bomb tile; landing here kills a process (used to pressure opponents)
-    END
+    start   SPL   #2, #0   ; spawn a new task and continue
+            NOP             ; spacer to diversify timing between tasks
+            DAT   #0, #0     ; current task dies
+            JMP   start       ; loop to continually spawn more
+    END start
     ```
   warrior.name: Unnamed
   warrior.author: Anonymous
   warrior.start: 0
-  warrior.instructions: (3)
-    [0] SPL.B  $     2, $     0
-    [1] JMP.B  $    -1, $     0
-    [2] DAT.F  $     0, #     0
+  warrior.instructions: (4)
+    [0] SPL.B  #     2, #     0
+    [1] NOP.F  $     0, $     0
+    [2] DAT.F  #     0, #     0
+    [3] JMP.B  $    -3, $     0

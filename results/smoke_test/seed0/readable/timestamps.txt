@@ -1,12 +1,12 @@
 [Timestamps]
 
 Total iterations: 3
-Total time: 170.94s
+Total time: 205.89s
 
 All entries:
   abs_iter=0, round=0, iter=0
-    dt=170.9396s, rss=83.5MB, vms=936.2MB
+    dt=205.8884s, rss=83.2MB, vms=936.2MB
   abs_iter=1, round=0, iter=1
-    dt=0.0002s, rss=83.5MB, vms=936.2MB
+    dt=0.0004s, rss=83.2MB, vms=936.2MB
   abs_iter=2, round=0, iter=2
-    dt=0.0002s, rss=83.5MB, vms=936.2MB
+    dt=0.0002s, rss=83.2MB, vms=936.2MB
