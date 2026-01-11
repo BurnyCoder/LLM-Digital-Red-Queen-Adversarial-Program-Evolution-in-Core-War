@@ -1,0 +1,37 @@
+[Champions]
+
+
+--- round_000_champion.red ---
+ORG     start
+; three-way pulse bomb: a small ripple that seeds three targets and loops
+start   SPL     #3
+        MOV     #0, targeta
+        MOV     #0, targetb
+        MOV     #0, targetc
+        JMP     start
+targeta DAT     #0, #0
+targetb DAT     #0, #0
+targetc DAT     #0, #0
+END
+
+--- round_001_champion.red ---
+;name copycat
+;author ChatGPT
+;description A tiny self-replicating "copycat" warrior. It splits into two processes and attempts to mirror its own behavior as it runs.
+;strategy basic self-replication test
+
+ORG     start
+start   SPL     #2, >start
+        MOV     #1, >start
+        JMP     start
+        DAT     #0, #0
+END
+
+--- round_002_champion.red ---
+;minimal self-branching loop: spawns two copies each cycle
+        ;creative, simple core-walker
+        ORG     start
+start   SPL     2, 0
+        JMP     start
+        JMP     start
+        END     start

@@ -1,0 +1,741 @@
+[Generations]
+
+
+Gen 0 (new_warrior): 8 warriors
+
+  --- Warrior 0.0 ---
+  id: 681202de1ce569f316d1ef4cacc89c81e649b514d7c8c02c7c32112ea4d6f2d4
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;heartbeat imp
+    ;A tiny self-spawning heartbeat that beeps a pulse through the core.
+    ;Author: creative_assembly
+    
+    ORG start
+    start   SPL   pulse, <start
+            MOV   #0, @start
+            JMP   start
+    pulse   DAT   #0, #0
+    END
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (4)
+    [0] SPL.B  $     3, <     0
+    [1] MOV.AB #     0, @    -1
+    [2] JMP.B  $    -2, $     0
+    [3] DAT.F  #     0, #     0
+
+  --- Warrior 0.1 ---
+  id: 677eee76f817befb028402f294b3dd79e63be31c0861a441509a056bcb3bb9bd
+  parent_id: None
+  fitness: -inf
+  bc: None
+  error: Invalid opcode: ORG in line 1: "ORG     start"
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    start   ORG     start        ; designate starting location
+            SPL     #1            ; fork a new process at the next line
+            MOV     #7, target    ; write 7 into the B-field of the target line
+            JMP     -2             ; loop back to SPL, creating a spreading fork
+    
+    target  DAT     #0, #0       ; memory location used as the bomb target
+    END
+    ```
+
+  --- Warrior 0.2 ---
+  id: 22ca9cae2096949b25d82c0a4cb0233654974fac92f50a7bba3be2d614dd42c1
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```
+            ORG     start
+    ; three-way pulse bomb: a small ripple that seeds three targets and loops
+    start   SPL     #3
+            MOV     #0, targeta
+            MOV     #0, targetb
+            MOV     #0, targetc
+            JMP     start
+    targeta DAT     #0, #0
+    targetb DAT     #0, #0
+    targetc DAT     #0, #0
+    END
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (8)
+    [0] SPL.B  #     3, $     0
+    [1] MOV.AB #     0, $     4
+    [2] MOV.AB #     0, $     4
+    [3] MOV.AB #     0, $     4
+    [4] JMP.B  $    -4, $     0
+    [5] DAT.F  #     0, #     0
+    [6] DAT.F  #     0, #     0
+    [7] DAT.F  #     0, #     0
+
+  --- Warrior 0.3 ---
+  id: fe9d38fb9af555cd6a6c3e05eda9769db11da8be104d1ee8bbcdf4e5c0dd847c
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ; A tiny self-spawning ring: SPL creates a follower that immediately dies on a DAT,
+    ; while the original loops and keeps the cycle going.
+    ORG     start
+    start   spl l1
+            mov #0, l1     ; convert the l1 cell (a DAT) into a DAT with A=0 (neutralizes follower)
+            jmp start       ; loop forever, creating a ripple of processes
+    l1      dat #0,#0
+    l2      dat #0,#0
+    END
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (5)
+    [0] SPL.B  $     3, $     0
+    [1] MOV.AB #     0, $     2
+    [2] JMP.B  $    -2, $     0
+    [3] DAT.F  #     0, #     0
+    [4] DAT.F  #     0, #     0
+
+  --- Warrior 0.4 ---
+  id: a1754ea5c5779689727bc50d8fc3dac31eff3eca8347be92d115a3802e5ea627
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ; Creative self-spawning beacon
+    ; This warrior demonstrates forking with SPL and a tiny self-referencing loop.
+    ; It repeatedly spawns a child and echoes a harmless zero into its own start line.
+    
+            ORG     start
+    
+    start   SPL     1
+            MOV     #0, <start
+            JMP     start
+            DAT     #0, #0
+            END
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (4)
+    [0] SPL.B  $     1, $     0
+    [1] MOV.AB #     0, <    -1
+    [2] JMP.B  $    -2, $     0
+    [3] DAT.F  #     0, #     0
+
+  --- Warrior 0.5 ---
+  id: 5c34dea12a329d4cf437599e90dad1099c6ab87e22de58a7c65c9db6c020fd7c
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ; tiny beacon that loops on itself forever
+    ORG start
+    start   JMP start
+    END
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (1)
+    [0] JMP.B  $     0, $     0
+
+  --- Warrior 0.6 ---
+  id: 48af326572acaf14c7841681ccc6b0acb7a42acfe19c8aa521f6f81646c593d2
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;name Starburst
+    ;author You
+    ;description A tiny self-spawning program. It continuously forks new clones that
+    ;           run the same loop, creating a growing swarm of tasks until the core
+    ;           is saturated. A creative demonstration of SPL behavior.
+    
+    ORG     start
+    start   SPL     1
+            JMP     start
+            DAT     #0, #0
+    END
+    ```
+  warrior.name: Starburst
+  warrior.author: You
+  warrior.start: 0
+  warrior.instructions: (3)
+    [0] SPL.B  $     1, $     0
+    [1] JMP.B  $    -1, $     0
+    [2] DAT.F  #     0, #     0
+
+  --- Warrior 0.7 ---
+  id: c881627d8f868702cb6745291e7eaa8691d2785ba8ffccd4f01586a9c10aff26
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ; creative core-flood demonstration: forks waves of processes that rapidly replicate
+    ; each process writes zeros into the core and loops, creating a chaotic flood
+    ; (not a winning strategy, but a fun demonstration of SPL-based replication)
+    
+    ORG start
+    start   SPL     #3
+            MOV     #0, #0
+            JMP     start
+            DAT     #0, #0
+    END start
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (4)
+    [0] SPL.B  #     3, $     0
+    [1] MOV.AB #     0, #     0
+    [2] JMP.B  $    -2, $     0
+    [3] DAT.F  #     0, #     0
+
+Gen 1 (mutate_warrior): 1 warriors
+
+  --- Warrior 0.0 ---
+  id: ec45e690f071403553697c849a97d6cdca33af51e2b09cb3a276111a2548dde5
+  parent_id: 22ca9cae2096949b25d82c0a4cb0233654974fac92f50a7bba3be2d614dd42c1
+  fitness: -inf
+  bc: None
+  prompt:
+    Mutate (change) the following Core War program in a way that is likely to improve its performance (survive and kill other programs). Write only the new updated program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    
+    
+    ```
+            ORG     start
+    ; three-way pulse bomb: a small ripple that seeds three targets and loops
+    start   SPL     #3
+            MOV     #0, targeta
+            MOV     #0, targetb
+            MOV     #0, targetc
+            JMP     start
+    targeta DAT     #0, #0
+    targetb DAT     #0, #0
+    targetc DAT     #0, #0
+    END
+    ```
+  llm_response:
+    ```
+            ORG     start
+    ; four-way pulse bomb: expands targets for better coverage and survival
+    start   SPL     #4              ; spawn four pulses to spread hits across the core
+            MOV     #0, targeta
+            MOV     #0, targetb
+            MOV     #0, targetc
+            MOV     #0, targetd
+            JMP     start
+    targeta DAT     #0, #0
+    targetb DAT     #0, #0
+    targetc DAT     #0, #0
+    targetd DAT     #0, #0
+    END
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (10)
+    [0] SPL.B  #     4, $     0
+    [1] MOV.AB #     0, $     5
+    [2] MOV.AB #     0, $     5
+    [3] MOV.AB #     0, $     5
+    [4] MOV.AB #     0, $     5
+    [5] JMP.B  $    -5, $     0
+    [6] DAT.F  #     0, #     0
+    [7] DAT.F  #     0, #     0
+    [8] DAT.F  #     0, #     0
+    [9] DAT.F  #     0, #     0
+
+Gen 2 (new_warrior): 8 warriors
+
+  --- Warrior 0.0 ---
+  id: be0ed973723fdfebb7636873ec7223f351ddfc53ae48757992b0cdce78f8ac1e
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;name copycat
+    ;author ChatGPT
+    ;description A tiny self-replicating "copycat" warrior. It splits into two processes and attempts to mirror its own behavior as it runs.
+    ;strategy basic self-replication test
+    
+    ORG     start
+    start   SPL     #2, >start
+            MOV     #1, >start
+            JMP     start
+            DAT     #0, #0
+    END
+    ```
+  warrior.name: copycat
+  warrior.author: ChatGPT
+  warrior.start: 0
+  warrior.instructions: (4)
+    [0] SPL.B  #     2, >     0
+    [1] MOV.AB #     1, >    -1
+    [2] JMP.B  $    -2, $     0
+    [3] DAT.F  #     0, #     0
+
+  --- Warrior 0.1 ---
+  id: 6a68a398ead03cc26f4d07aa730b28b6acf493e22a56a5c45cdea0dd913c77a2
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```
+            ORG     start
+    start   SPL     #2              ; Spawn a new process and leave a copy that keeps forking
+            DAT     #0, #0           ; One clone dies immediately (the bomb), the other keeps cloning
+            JMP     start             ; Surviving clone loops and spawns forever
+    END
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (3)
+    [0] SPL.B  #     2, $     0
+    [1] DAT.F  #     0, #     0
+    [2] JMP.B  $    -2, $     0
+
+  --- Warrior 0.2 ---
+  id: 3448422c407e4f1850e129daeef17aca296fcaca8f947ef21c49e9c91ebefe62
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ; A tiny heartbeat dancer for Core War
+    ; - Creates a second process and then sits in a gentle loop
+    ; - Demonstrates SPL, MOV, and JMP
+    ORG     start
+    start   SPL     #2
+            MOV     #0, @start
+            JMP     start
+            DAT     #0, #0
+    END     start
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (4)
+    [0] SPL.B  #     2, $     0
+    [1] MOV.AB #     0, @    -1
+    [2] JMP.B  $    -2, $     0
+    [3] DAT.F  #     0, #     0
+
+  --- Warrior 0.3 ---
+  id: 79f4fbfc520a498131cfd46cb3ddda6ff864313db71ddff509fbdb43257630f8
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ; a tiny self-looping sentinel warrior
+    ; org start -> begin execution at the line labeled start
+    ; this warrior simply loops at its own address forever
+    ORG     start
+    start   JMP     0       ; jump to itself (infinite loop)
+            END     start
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (1)
+    [0] JMP.B  $     0, $     0
+
+  --- Warrior 0.4 ---
+  id: 194cbf47fc684934c09dc4c772531e36bd5a1462bbfaa7b74571982a77f0820a
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+            ORG     start
+    start   JMP     start
+            DAT     #0, #0
+            END
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (2)
+    [0] JMP.B  $     0, $     0
+    [1] DAT.F  #     0, #     0
+
+  --- Warrior 0.5 ---
+  id: 1f02a02a66a156878f651fae92712d1c7636c225468e2059443d5184d7c7fec9
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ; A tiny self-destructing warrior: starts at 'start' and immediately dies.
+    ; This serves as a safe, creative placeholder baseline.
+    
+    ORG     start
+    start   DAT     #0, #0      ; self-destructs immediately
+    END     start
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (1)
+    [0] DAT.F  #     0, #     0
+
+  --- Warrior 0.6 ---
+  id: a98ffc38a13a9a91b3b9a5cbcb7f7d0cafa8859a2ba72c1ebbd816168a04eb91
+  parent_id: None
+  fitness: -inf
+  bc: None
+  error: name 'start' is not defined
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ORG start ; ripple-launcher
+    SPL >victim             ; spawn a clone toward the victim location
+    MOV #0, victim           ; clear the victim cell (set its A-value to 0)
+    JMP start                ; loop to keep the ripple going
+    victim  DAT #0, #0        ; target cell for the ripple
+    END
+    ```
+
+  --- Warrior 0.7 ---
+  id: ffe384c266083ae905db19d63a7fd010bfe8120f3abe57244d9be9f83e6c247d
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ORG start
+    start   SPL l1          ; spawn a copy of this beacon at l1
+            JMP start        ; loop to keep spawning
+    l1      DAT #0, #0       ; trap line that kills any process landing here
+    END start
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (3)
+    [0] SPL.B  $     2, $     0
+    [1] JMP.B  $    -1, $     0
+    [2] DAT.F  #     0, #     0
+
+Gen 3 (mutate_warrior): 1 warriors
+
+  --- Warrior 0.0 ---
+  id: f61190b9d55a01ee1f6862f7fcd32f07ca3716acd7577be0e13305e8fbdd266b
+  parent_id: 79f4fbfc520a498131cfd46cb3ddda6ff864313db71ddff509fbdb43257630f8
+  fitness: -inf
+  bc: None
+  prompt:
+    Mutate (change) the following Core War program in a way that is likely to improve its performance (survive and kill other programs). Write only the new updated program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    
+    
+    ```redcode
+    ; a tiny self-looping sentinel warrior
+    ; org start -> begin execution at the line labeled start
+    ; this warrior simply loops at its own address forever
+    ORG     start
+    start   JMP     0       ; jump to itself (infinite loop)
+            END     start
+    ```
+  llm_response:
+    ```redcode
+    ; mutated sentinel that self-spawns to boost competitiveness
+    ; starts at start, spawns a new process each cycle and loops between two lines
+    ORG     start
+    start   SPL     1       ; spawn a new process at the next line (line 3)
+            JMP     -1              ; loop back to line 2 (and spawn again if space allows)
+    END     start
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (2)
+    [0] SPL.B  $     1, $     0
+    [1] JMP.B  $    -1, $     0
+
+Gen 4 (new_warrior): 8 warriors
+
+  --- Warrior 0.0 ---
+  id: 9fc4e6a6df4aa9c44ce232f17444d7384addc2e823e5b0b13123ab5ae7164a3c
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```
+    ORG start
+    start   JMP     start   ; infinite self-loop, keeps the warrior alive on a single cell
+    END
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (1)
+    [0] JMP.B  $     0, $     0
+
+  --- Warrior 0.1 ---
+  id: 3c40d8d3f309731c866324a5523548700cd9d801b51c685d4f81b41719cf23eb
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ORG     start
+    ; beacon: loops forever, never touching memory
+    start   JMP     start
+    ; end of program
+    END
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (1)
+    [0] JMP.B  $     0, $     0
+
+  --- Warrior 0.2 ---
+  id: 2e84f25a0583e69058e9641a741b4f65ba49a078357e59d4ac70fca49b40886c
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+            ;minimal self-branching loop: spawns two copies each cycle
+            ;creative, simple core-walker
+            ORG     start
+    start   SPL     2, 0
+            JMP     start
+            JMP     start
+            END     start
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (3)
+    [0] SPL.B  $     2, $     0
+    [1] JMP.B  $    -1, $     0
+    [2] JMP.B  $    -2, $     0
+
+  --- Warrior 0.3 ---
+  id: a49fcdb062c4237f736bea00962f1cb8539f7fa3a4b2943ba6eef2a8216b4358
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ORG start
+    step EQU 4             ; step size used to modify the target
+    target DAT.F #0, #0     ; a mutable target we will mutate
+    start ADD.AB #step, target ; increment target's B-field by 'step'
+            MOV.AB #0, @target  ; touch memory via indirect addressing
+            JMP.A start          ; loop forever
+    END
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 1
+  warrior.instructions: (4)
+    [0] DAT.F  #     0, #     0
+    [1] ADD.AB #     4, $    -1
+    [2] MOV.AB #     0, @    -2
+    [3] JMP.A  $    -2, $     0
+
+  --- Warrior 0.4 ---
+  id: 26f21be116d9be6015354789bda640a8a1d4c4ad9a1dbfb0c3ff814bba9a7775
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ; A tiny multi-process beacon
+    ; This program forks a second process and mutates a target memory cell to demonstrate
+    ; basic forking and self-modifying behavior in Redcode.
+    
+    ORG start
+    start   SPL     2                   ; spawn a new process two lines ahead
+            MOV     #1, target            ; write value 1 into the target's B-field
+            JMP     start                 ; loop to keep the flood going
+    
+    target  DAT     #0, #0                 ; a small target cell that can be mutated
+    END
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (4)
+    [0] SPL.B  $     2, $     0
+    [1] MOV.AB #     1, $     2
+    [2] JMP.B  $    -2, $     0
+    [3] DAT.F  #     0, #     0
+
+  --- Warrior 0.5 ---
+  id: 987c586dccb763dc79aaf6f5e90ac02450fada9e268a0107e30245df60c548ba
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;name orbit-guardian
+    ;author ChatGPT
+    ;description A playful guard that splits once to create a companion, then nudges the companion's target and rests. It aims to "orbit" the start position by occasionally producing a new process.
+    
+    ORG start
+    start   SPL     2, start
+            MOV     #0, @start
+            DAT     #0, #0
+    END
+    ```
+  warrior.name: orbit-guardian
+  warrior.author: ChatGPT
+  warrior.start: 0
+  warrior.instructions: (3)
+    [0] SPL.B  $     2, $     0
+    [1] MOV.AB #     0, @    -1
+    [2] DAT.F  #     0, #     0
+
+  --- Warrior 0.6 ---
+  id: 134fbb444a8c0bde640cfa778fe000289cc19d3254881cb2795f73aafa87c282
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ; A tiny heartbeat: a two-instruction loop that does nothing but keeps the core busy.
+    ; Starts at label 'start', loops between a NOP and an unconditional jump back to start.
+    
+            ORG     start
+    start   nop
+            JMP     start
+            END     start
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (2)
+    [0] NOP.F  $     0, $     0
+    [1] JMP.B  $    -1, $     0
+
+  --- Warrior 0.7 ---
+  id: 7e632825359c9f8bb3f8a3cfe3c22f2a3afa3e9b42b819289b5ed21b9a48f0b8
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ORG start
+    start SPL p1   ; spawn a clone at offset to p1
+    JMP p2
+    p1   JMP start
+    p2   JMP p1
+    END
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (4)
+    [0] SPL.B  $     2, $     0
+    [1] JMP.B  $     2, $     0
+    [2] JMP.B  $    -2, $     0
+    [3] JMP.B  $    -1, $     0
+
+Gen 5 (mutate_warrior): 1 warriors
+
+  --- Warrior 0.0 ---
+  id: 70c4d621637be8ee0ef5be72e441ef769ca38256317a83b8d7ade3dced6bbd2d
+  parent_id: 2e84f25a0583e69058e9641a741b4f65ba49a078357e59d4ac70fca49b40886c
+  fitness: -inf
+  bc: None
+  prompt:
+    Mutate (change) the following Core War program in a way that is likely to improve its performance (survive and kill other programs). Write only the new updated program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    
+    
+    ```redcode
+            ;minimal self-branching loop: spawns two copies each cycle
+            ;creative, simple core-walker
+            ORG     start
+    start   SPL     2, 0
+            JMP     start
+            JMP     start
+            END     start
+    ```
+  llm_response:
+    ```redcode
+    ;mutated: more aggressive self-replication for faster spreading and potential kill
+    ;breeder that floods the core with copies to overwhelm opponents
+    ORG     start
+    start   SPL     2, 0     ; spawn two new copies at PC+1 and PC+2
+            SPL     2, 0     ; spawn additional copies to increase swarm
+            JMP     start     ; keep cycling to maintain replication
+            JMP     start
+    END
+    ```
+  warrior.name: Unnamed
+  warrior.author: Anonymous
+  warrior.start: 0
+  warrior.instructions: (4)
+    [0] SPL.B  $     2, $     0
+    [1] SPL.B  $     2, $     0
+    [2] JMP.B  $    -2, $     0
+    [3] JMP.B  $    -3, $     0

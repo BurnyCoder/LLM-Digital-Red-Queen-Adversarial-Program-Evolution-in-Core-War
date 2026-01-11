@@ -1,0 +1,308 @@
+[MAP-Elites Archive]
+
+Round 0:
+  Archive cells: 3
+  Fitness history: [0.9999999999993365, 0.9999999999993365, 1.7093574999989325, 1.7093574999989325, 1.7093574999989325, 1.7093574999989325, 1.7093574999989325, 1.7093574999989325, 1.7093574999989325, 1.7093574999989325]
+  Best fitness: 1.7094
+  Best BC: (4, 1)
+
+  All entries:
+
+    --- BC (3, 5) ---
+    id: 681202de1ce569f316d1ef4cacc89c81e649b514d7c8c02c7c32112ea4d6f2d4
+    parent_id: None
+    fitness: 0.9999999999993365
+    bc: (3, 5)
+    outputs: {'score': np.float64(0.9999999999993365), 'alive_score': np.float64(0.9999999999993365), 'total_spawned_procs': np.float64(993.5), 'memory_coverage': np.float64(8000.0)}
+    prompt:
+      Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    llm_response:
+      ```redcode
+      ;heartbeat imp
+      ;A tiny self-spawning heartbeat that beeps a pulse through the core.
+      ;Author: creative_assembly
+      
+      ORG start
+      start   SPL   pulse, <start
+              MOV   #0, @start
+              JMP   start
+      pulse   DAT   #0, #0
+      END
+      ```
+    warrior.name: Unnamed
+    warrior.author: Anonymous
+    warrior.start: 0
+    warrior.instructions: (4)
+      [0] SPL.B  $     3, <     0
+      [1] MOV.AB #     0, @    -1
+      [2] JMP.B  $    -2, $     0
+      [3] DAT.F  #     0, #     0
+
+    --- BC (4, 1) ---
+    id: 22ca9cae2096949b25d82c0a4cb0233654974fac92f50a7bba3be2d614dd42c1
+    parent_id: None
+    fitness: 1.7093574999989325
+    bc: (4, 1)
+    outputs: {'score': np.float64(1.7093574999989325), 'alive_score': np.float64(0.9999999999993365), 'total_spawned_procs': np.float64(1290.55), 'memory_coverage': np.float64(75.1)}
+    prompt:
+      Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    llm_response:
+      ```
+              ORG     start
+      ; three-way pulse bomb: a small ripple that seeds three targets and loops
+      start   SPL     #3
+              MOV     #0, targeta
+              MOV     #0, targetb
+              MOV     #0, targetc
+              JMP     start
+      targeta DAT     #0, #0
+      targetb DAT     #0, #0
+      targetc DAT     #0, #0
+      END
+      ```
+    warrior.name: Unnamed
+    warrior.author: Anonymous
+    warrior.start: 0
+    warrior.instructions: (8)
+      [0] SPL.B  #     3, $     0
+      [1] MOV.AB #     0, $     4
+      [2] MOV.AB #     0, $     4
+      [3] MOV.AB #     0, $     4
+      [4] JMP.B  $    -4, $     0
+      [5] DAT.F  #     0, #     0
+      [6] DAT.F  #     0, #     0
+      [7] DAT.F  #     0, #     0
+
+    --- BC (0, 5) ---
+    id: 5c34dea12a329d4cf437599e90dad1099c6ab87e22de58a7c65c9db6c020fd7c
+    parent_id: None
+    fitness: 0.9999999999993365
+    bc: (0, 5)
+    outputs: {'score': np.float64(0.9999999999993365), 'alive_score': np.float64(0.9999999999993365), 'total_spawned_procs': np.float64(0.0), 'memory_coverage': np.float64(8000.0)}
+    prompt:
+      Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    llm_response:
+      ```redcode
+      ; tiny beacon that loops on itself forever
+      ORG start
+      start   JMP start
+      END
+      ```
+    warrior.name: Unnamed
+    warrior.author: Anonymous
+    warrior.start: 0
+    warrior.instructions: (1)
+      [0] JMP.B  $     0, $     0
+Round 1:
+  Archive cells: 4
+  Fitness history: [1.4743024999990655, 1.4743024999990655, 1.4743024999990655, 1.4743024999990655, 1.4743024999990655, 1.4743024999990655, 1.4743024999990655, 1.4743024999990655, 1.4743024999990655, 1.4743024999990655, 1.4743024999990655]
+  Best fitness: 1.4743
+  Best BC: (4, 1)
+
+  All entries:
+
+    --- BC (4, 1) ---
+    id: be0ed973723fdfebb7636873ec7223f351ddfc53ae48757992b0cdce78f8ac1e
+    parent_id: None
+    fitness: 1.4743024999990655
+    bc: (4, 1)
+    outputs: {'score': np.float64(1.4743024999990655), 'alive_score': np.float64(0.9999999999993365), 'total_spawned_procs': np.float64(4591.4), 'memory_coverage': np.float64(22.55)}
+    prompt:
+      Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    llm_response:
+      ```redcode
+      ;name copycat
+      ;author ChatGPT
+      ;description A tiny self-replicating "copycat" warrior. It splits into two processes and attempts to mirror its own behavior as it runs.
+      ;strategy basic self-replication test
+      
+      ORG     start
+      start   SPL     #2, >start
+              MOV     #1, >start
+              JMP     start
+              DAT     #0, #0
+      END
+      ```
+    warrior.name: copycat
+    warrior.author: ChatGPT
+    warrior.start: 0
+    warrior.instructions: (4)
+      [0] SPL.B  #     2, >     0
+      [1] MOV.AB #     1, >    -1
+      [2] JMP.B  $    -2, $     0
+      [3] DAT.F  #     0, #     0
+
+    --- BC (5, 5) ---
+    id: 6a68a398ead03cc26f4d07aa730b28b6acf493e22a56a5c45cdea0dd913c77a2
+    parent_id: None
+    fitness: 1.2177553125004268
+    bc: (5, 5)
+    outputs: {'score': np.float64(1.2177553125004268), 'alive_score': np.float64(0.9999999999993365), 'total_spawned_procs': np.float64(19474.25), 'memory_coverage': np.float64(4400.9)}
+    prompt:
+      Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    llm_response:
+      ```
+              ORG     start
+      start   SPL     #2              ; Spawn a new process and leave a copy that keeps forking
+              DAT     #0, #0           ; One clone dies immediately (the bomb), the other keeps cloning
+              JMP     start             ; Surviving clone loops and spawns forever
+      END
+      ```
+    warrior.name: Unnamed
+    warrior.author: Anonymous
+    warrior.start: 0
+    warrior.instructions: (3)
+      [0] SPL.B  #     2, $     0
+      [1] DAT.F  #     0, #     0
+      [2] JMP.B  $    -2, $     0
+
+    --- BC (0, 5) ---
+    id: 79f4fbfc520a498131cfd46cb3ddda6ff864313db71ddff509fbdb43257630f8
+    parent_id: None
+    fitness: 1.2177553125004268
+    bc: (0, 5)
+    outputs: {'score': np.float64(1.2177553125004268), 'alive_score': np.float64(0.9999999999993365), 'total_spawned_procs': np.float64(0.0), 'memory_coverage': np.float64(4400.45)}
+    prompt:
+      Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    llm_response:
+      ```redcode
+      ; a tiny self-looping sentinel warrior
+      ; org start -> begin execution at the line labeled start
+      ; this warrior simply loops at its own address forever
+      ORG     start
+      start   JMP     0       ; jump to itself (infinite loop)
+              END     start
+      ```
+    warrior.name: Unnamed
+    warrior.author: Anonymous
+    warrior.start: 0
+    warrior.instructions: (1)
+      [0] JMP.B  $     0, $     0
+
+    --- BC (0, 0) ---
+    id: 1f02a02a66a156878f651fae92712d1c7636c225468e2059443d5184d7c7fec9
+    parent_id: None
+    fitness: 0.0
+    bc: (0, 0)
+    outputs: {'score': np.float64(0.0), 'alive_score': np.float64(0.0), 'total_spawned_procs': np.float64(0.0), 'memory_coverage': np.float64(0.0)}
+    prompt:
+      Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    llm_response:
+      ```redcode
+      ; A tiny self-destructing warrior: starts at 'start' and immediately dies.
+      ; This serves as a safe, creative placeholder baseline.
+      
+      ORG     start
+      start   DAT     #0, #0      ; self-destructs immediately
+      END     start
+      ```
+    warrior.name: Unnamed
+    warrior.author: Anonymous
+    warrior.start: 0
+    warrior.instructions: (1)
+      [0] DAT.F  #     0, #     0
+Round 2:
+  Archive cells: 4
+  Fitness history: [0.9051045833345862, 0.9051045833345862, 1.3198937500019878, 1.3198937500019878, 1.3198937500019878, 1.3198937500019878, 1.3198937500019878, 1.3198937500019878, 1.3198937500019878, 1.3198937500019878, 1.3198937500019878, 1.3198937500019878]
+  Best fitness: 1.3199
+  Best BC: (4, 1)
+
+  All entries:
+
+    --- BC (0, 4) ---
+    id: 134fbb444a8c0bde640cfa778fe000289cc19d3254881cb2795f73aafa87c282
+    parent_id: None
+    fitness: 0.9051170833345863
+    bc: (0, 4)
+    outputs: {'score': np.float64(0.9051170833345863), 'alive_score': np.float64(0.6889174999995762), 'total_spawned_procs': np.float64(0.0), 'memory_coverage': np.float64(1389.35)}
+    prompt:
+      Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    llm_response:
+      ```redcode
+      ; A tiny heartbeat: a two-instruction loop that does nothing but keeps the core busy.
+      ; Starts at label 'start', loops between a NOP and an unconditional jump back to start.
+      
+              ORG     start
+      start   nop
+              JMP     start
+              END     start
+      ```
+    warrior.name: Unnamed
+    warrior.author: Anonymous
+    warrior.start: 0
+    warrior.instructions: (2)
+      [0] NOP.F  $     0, $     0
+      [1] JMP.B  $    -1, $     0
+
+    --- BC (4, 1) ---
+    id: 2e84f25a0583e69058e9641a741b4f65ba49a078357e59d4ac70fca49b40886c
+    parent_id: None
+    fitness: 1.3198937500019878
+    bc: (4, 1)
+    outputs: {'score': np.float64(1.3198937500019878), 'alive_score': np.float64(0.9999999999993365), 'total_spawned_procs': np.float64(6637.65), 'memory_coverage': np.float64(11.25)}
+    prompt:
+      Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    llm_response:
+      ```redcode
+              ;minimal self-branching loop: spawns two copies each cycle
+              ;creative, simple core-walker
+              ORG     start
+      start   SPL     2, 0
+              JMP     start
+              JMP     start
+              END     start
+      ```
+    warrior.name: Unnamed
+    warrior.author: Anonymous
+    warrior.start: 0
+    warrior.instructions: (3)
+      [0] SPL.B  $     2, $     0
+      [1] JMP.B  $    -1, $     0
+      [2] JMP.B  $    -2, $     0
+
+    --- BC (1, 0) ---
+    id: 987c586dccb763dc79aaf6f5e90ac02450fada9e268a0107e30245df60c548ba
+    parent_id: None
+    fitness: 3.7500000000000003e-05
+    bc: (1, 0)
+    outputs: {'score': np.float64(3.7500000000000003e-05), 'alive_score': np.float64(3.7500000000000003e-05), 'total_spawned_procs': np.float64(1.0), 'memory_coverage': np.float64(2.0)}
+    prompt:
+      Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    llm_response:
+      ```redcode
+      ;name orbit-guardian
+      ;author ChatGPT
+      ;description A playful guard that splits once to create a companion, then nudges the companion's target and rests. It aims to "orbit" the start position by occasionally producing a new process.
+      
+      ORG start
+      start   SPL     2, start
+              MOV     #0, @start
+              DAT     #0, #0
+      END
+      ```
+    warrior.name: orbit-guardian
+    warrior.author: ChatGPT
+    warrior.start: 0
+    warrior.instructions: (3)
+      [0] SPL.B  $     2, $     0
+      [1] MOV.AB #     0, @    -1
+      [2] DAT.F  #     0, #     0
+
+    --- BC (0, 5) ---
+    id: 9241952a564eb7dce5843e4f12951a865f04ed2752c6e0d36bd2af38f4cf6edd
+    parent_id: None
+    fitness: 0.26651208333362064
+    bc: (0, 5)
+    outputs: {'score': np.float64(0.26651208333362064), 'alive_score': np.float64(0.20996374999989564), 'total_spawned_procs': np.float64(0.0), 'memory_coverage': np.float64(5997.1)}
+    prompt:
+      /home/burny/projects/ml-playground/LLM-Digital-Red-Queen-Adversarial-Program-Evolution-in-Core-War/human_warriors/imp.red
+    llm_response:
+      ;name IMP
+      ;author A. K. Dewdney
+      
+      mov.i   #1,     }0
+    warrior.name: IMP
+    warrior.author: A. K. Dewdney
+    warrior.start: 0
+    warrior.instructions: (1)
+      [0] MOV.I  #     1, }     0
