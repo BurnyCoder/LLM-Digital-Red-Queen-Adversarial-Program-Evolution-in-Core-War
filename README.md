@@ -54,8 +54,8 @@ Prompts:
 
 To run this project locally, you can start by cloning this repo.
 ```sh
-git clone https://github.com/SakanaAI/drq.git
-cd drq
+git clone https://github.com/BurnyCoder/LLM-Digital-Red-Queen-Adversarial-Program-Evolution-in-Core-War
+cd LLM-Digital-Red-Queen-Adversarial-Program-Evolution-in-Core-War
 ```
 
 Then, install dependencies using `uv` and the local corewar package:
