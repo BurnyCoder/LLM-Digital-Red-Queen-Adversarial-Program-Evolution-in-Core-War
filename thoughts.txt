@@ -1,0 +1,24 @@
+Digital Red Queen: Adversarial Program Evolution in Core War with LLMs
+https://fxtwitter.com/i/status/2009294780594065555
+https://pub.sakana.ai/drq/
+https://arxiv.org/abs/2601.03335
+- use winning as RL signal
+- do this setup in cyber security context
+- characters in general game engine?
+- other evo algorithms like NEAT 
+- in brainfuck? https://www.youtube.com/watch?v=rMSEqJ_4EBk
+- another thought i have is if this kills creativity in a way, because i bet llms tunnel vision on existing functioning red core programs in the training data: so how about combining random mutations and mutations by LLM priors?  https://corewar.co.uk/vowk/alife9ac.pdf  (maybe adding random mutations wont make the warriors collapse diversity to the same phenotypes)
+- enforce cooperative/symbiotic behaviors (survive for as long as possible, somehow kill winner takes all incentives) (put warriors in groups and optimize for summed/multiplied fitness, and that the fitness values of the different warriors in groups must be close to eachother so that one doesnt dominate with a lot while others are zero)
+- mutating llms weights
+- wondering how would newest frontier models would do, maybe with web search, or claude code
+- llm creates game in pygame and then mutates characters
+- i wanna see the space of cell grid levels of discretization as a hyperparam in map elites graphed out
+- how about inspiration from Huxley-Gödel Machine and optimize for more long term fitness by doing bigger mutation tree, instead of short term fitness :D "aggregates the performances of the descendants" https://arxiv.org/abs/2510.21614v1
+- this but for cybersecurity
+- theres this paper that does selfplay rl by llm adding bugs and llm fixing bugs adversarialy, so maybe same can be done for adding and fixing security vulnerabilities https://arxiv.org/abs/2512.18552 
+- wondering how would few shot learning improve performance, i guess it would likely increase convergence, and likely reduce diversity 
+- combine RL and evolutionary algorithms
+- remove "in a way that is likely to improve performance" from prompt
+- It'd be neat if the rules themselves would also be dynamic. - That's the POET-way, basically: The environments coevolve with the agents (hmm, dynamic programs, dynamic models generating the programs, dynamic environment in which the programs live in: now we're getting to the constantly changing real world everywhere (except for laws of physics) ) (Google honestly did various much more impressive self-play things like that thing where they had agents learn multiple different games with changing rules in a 3D environment, and ARC-AGI-3 tries to have all sorts of games that are not in training that the AI systems should be able to generalize/adapt to )
+-  i wonder if random mutation and selection would also result in "Generality is defined as the fraction of unseen human warriors defeated or tied, measuring a warrior’s ability to adapt to novel threats in a zero-shot setting." like, im wondering to what degree its llm training data bias and can be found in the training data, to what degree its llm creating some actually OOD things, to what degree novel things is created? research it 
+-  do this method on any of those games https://en.wikipedia.org/wiki/Programming_game https://en.wikipedia.org/wiki/Category:Programming_games
