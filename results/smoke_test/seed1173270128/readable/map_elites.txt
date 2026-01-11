@@ -1,0 +1,257 @@
+[MAP-Elites Archive]
+
+Round 0:
+  Archive cells: 4
+  Fitness history: [0.9999999999993365, 1.523283124999033, 1.523283124999033, 1.523283124999033]
+  Best fitness: 1.5233
+  Best BC: (4, 2)
+
+  All entries:
+
+    --- BC (1, 5) ---
+    id: f3a88ab27f1e813bbc5d6a197a717b59f2b2ac6b5bf1e1cb4c871abdcea12198
+    parent_id: None
+    fitness: 0.9999999999993365
+    bc: (1, 5)
+    outputs: {'score': np.float64(0.9999999999993365), 'alive_score': np.float64(0.9999999999993365), 'total_spawned_procs': np.float64(2.0), 'memory_coverage': np.float64(8000.0)}
+    prompt:
+      Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    llm_response:
+      ```redcode
+      ;redcode
+      ;name          Lantern Weaver
+      ;author        ChatGPT
+      ;strategy      A "lantern" scanner that drops a small SPL/MOV snare, then
+      ;strategy      weaves a simple imp-like replicator from a protected gate.
+      ;strategy      The scanner advances by a stride, probes for non-zero, and
+      ;strategy      when it "sees" something it plants a snare and keeps moving.
+      
+              ORG     start
+      
+      step    EQU     37              ; scanning stride (co-prime-ish to many cores)
+      gap     EQU     8               ; spacing used by the weaver
+      
+      ; --- core pieces (data / templates) ---
+      ptr     DAT.F   #0,     #0      ; pointer for scanner (B-field is walked)
+      bomb    SPL.B   #0,     {0      ; snare: split a process into a predec-indirect pit
+      trap    MOV.I   #0,     <0      ; pit filler: keeps victims busy / self-biting
+      imp     MOV.I   0,      1       ; tiny imp instruction used by the weaver
+      gate    DAT.F   #0,     #0      ; gate location (gets used as a safe anchor)
+      
+      ; --- main entry ---
+      start   MOV.I   trap,   gate     ; lay down a local "gate" payload
+      scan    ADD.AB  #step,  ptr      ; advance pointer
+              SNE.I   #0,     @ptr     ; if target is not DAT 0,0 (or generally non-zero)
+      hit     MOV.I   bomb,   @ptr     ; drop snare on the found location
+              MOV.I   trap,   <ptr     ; deepen the pit just behind it
+              JMP.A   weave,  0        ; start weaving an imp-like strand nearby
+      
+      ; --- weaving / replication ---
+      weave   SPL.B   2,      0        ; two processes: one keeps scanning, one weaves
+              JMP.A   scan,   0        ; process 1 returns to scanning
+              MOV.I   imp,    gate+gap  ; process 2 seeds an imp a bit away from gate
+              MOV.I   imp,    gate+gap+1
+              MOV.I   imp,    gate+gap+2
+              JMP.A   gate+gap, 0      ; run the little imp-chain from the safe area
+      
+              END
+      ```
+    warrior.name: Lantern Weaver
+    warrior.author: ChatGPT
+    warrior.start: 5
+    warrior.instructions: (17)
+      [0] DAT.F  #     0, #     0
+      [1] SPL.B  #     0, {     0
+      [2] MOV.I  #     0, <     0
+      [3] MOV.I  $     0, $     1
+      [4] DAT.F  #     0, #     0
+      [5] MOV.I  $    -3, $    -1
+      [6] ADD.AB #    37, $    -6
+      [7] SNE.I  #     0, @    -7
+      [8] MOV.I  $    -7, @    -8
+      [9] MOV.I  $    -7, <    -9
+      [10] JMP.A  $     1, $     0
+      [11] SPL.B  $     2, $     0
+      [12] JMP.A  $    -6, $     0
+      [13] MOV.I  $   -10, $    -1
+      [14] MOV.I  $   -11, $    -1
+      [15] MOV.I  $   -12, $    -1
+      [16] JMP.A  $    -4, $     0
+
+    --- BC (4, 2) ---
+    id: 0f8bef851e33f62251d84eddc13f897d6fa9a692937517de83aac9ef1fcb5e46
+    parent_id: None
+    fitness: 1.523283124999033
+    bc: (4, 2)
+    outputs: {'score': np.float64(1.523283124999033), 'alive_score': np.float64(0.9999999999993365), 'total_spawned_procs': np.float64(1799.9), 'memory_coverage': np.float64(108.0)}
+    prompt:
+      Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    llm_response:
+      ```redcode
+      ;redcode-94
+      ;name          Moth to a Flame
+      ;author        assistant
+      ;strategy      A compact "lure-and-scorch" scanner:
+      ;strategy      - A small probe advances through core and checks for non-empty cells.
+      ;strategy      - When it sees something that isn't the default DAT 0,0,
+      ;strategy        it drops a tiny SPL/DAT stun/kill pair around that area.
+      ;strategy      - Continues stepping to find more targets.
+      
+              ORG     start
+      
+      step    EQU     29              ; relatively prime-ish step to cover core well
+      gap     EQU     6               ; spacing between bomb components
+      
+      probe   DAT.F   #0,     #0      ; will be used as a moving pointer (B-field)
+      
+      bomb1   SPL.B   #0,     #0      ; process-split "stun" (ties up enemy if executed)
+      bomb2   DAT.F   #0,     #0      ; hard kill if executed
+      
+      start   ADD.AB  #step,  probe   ; probe.B += step
+      scan    SNE.I   $0,     @probe  ; compare current instruction to contents at probe
+              JMP.A   bump,   $0      ; if equal (likely empty-ish), keep moving
+      hit     MOV.I   bomb1,  @probe  ; drop SPL bomb at target
+              MOV.I   bomb2,  @probe+gap ; drop DAT a few cells away to catch movement
+      bump    JMP.A   start,  $0      ; loop forever
+      
+              END
+      ```
+    warrior.name: Moth to a Flame
+    warrior.author: assistant
+    warrior.start: 3
+    warrior.instructions: (9)
+      [0] DAT.F  #     0, #     0
+      [1] SPL.B  #     0, #     0
+      [2] DAT.F  #     0, #     0
+      [3] ADD.AB #    29, $    -3
+      [4] SNE.I  $     0, @    -4
+      [5] JMP.A  $     3, $     0
+      [6] MOV.I  $    -5, @    -6
+      [7] MOV.I  $    -5, @    -1
+      [8] JMP.A  $    -5, $     0
+
+    --- BC (0, 5) ---
+    id: 9241952a564eb7dce5843e4f12951a865f04ed2752c6e0d36bd2af38f4cf6edd
+    parent_id: None
+    fitness: 0.9999999999993365
+    bc: (0, 5)
+    outputs: {'score': np.float64(0.9999999999993365), 'alive_score': np.float64(0.9999999999993365), 'total_spawned_procs': np.float64(0.0), 'memory_coverage': np.float64(8000.0)}
+    prompt:
+      /home/burny/projects/ml-playground/LLM-Digital-Red-Queen-Adversarial-Program-Evolution-in-Core-War/human_warriors/imp.red
+    llm_response:
+      ;name IMP
+      ;author A. K. Dewdney
+      
+      mov.i   #1,     }0
+    warrior.name: IMP
+    warrior.author: A. K. Dewdney
+    warrior.start: 0
+    warrior.instructions: (1)
+      [0] MOV.I  #     1, }     0
+
+    --- BC (4, 4) ---
+    id: 019d7c5a7ce4f4f094e34853ab8c2a9762a1b376f372add12dab02332634ea0a
+    parent_id: f3a88ab27f1e813bbc5d6a197a717b59f2b2ac6b5bf1e1cb4c871abdcea12198
+    fitness: 1.2939368749991766
+    bc: (4, 4)
+    outputs: {'score': np.float64(1.2939368749991766), 'alive_score': np.float64(0.9113199999994019), 'total_spawned_procs': np.float64(3610.5), 'memory_coverage': np.float64(3221.85)}
+    prompt:
+      Mutate (change) the following Core War program in a way that is likely to improve its performance (survive and kill other programs). Write only the new updated program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+      
+      
+      ```redcode
+      ;redcode
+      ;name          Lantern Weaver
+      ;author        ChatGPT
+      ;strategy      A "lantern" scanner that drops a small SPL/MOV snare, then
+      ;strategy      weaves a simple imp-like replicator from a protected gate.
+      ;strategy      The scanner advances by a stride, probes for non-zero, and
+      ;strategy      when it "sees" something it plants a snare and keeps moving.
+      
+              ORG     start
+      
+      step    EQU     37              ; scanning stride (co-prime-ish to many cores)
+      gap     EQU     8               ; spacing used by the weaver
+      
+      ; --- core pieces (data / templates) ---
+      ptr     DAT.F   #0,     #0      ; pointer for scanner (B-field is walked)
+      bomb    SPL.B   #0,     {0      ; snare: split a process into a predec-indirect pit
+      trap    MOV.I   #0,     <0      ; pit filler: keeps victims busy / self-biting
+      imp     MOV.I   0,      1       ; tiny imp instruction used by the weaver
+      gate    DAT.F   #0,     #0      ; gate location (gets used as a safe anchor)
+      
+      ; --- main entry ---
+      start   MOV.I   trap,   gate     ; lay down a local "gate" payload
+      scan    ADD.AB  #step,  ptr      ; advance pointer
+              SNE.I   #0,     @ptr     ; if target is not DAT 0,0 (or generally non-zero)
+      hit     MOV.I   bomb,   @ptr     ; drop snare on the found location
+              MOV.I   trap,   <ptr     ; deepen the pit just behind it
+              JMP.A   weave,  0        ; start weaving an imp-like strand nearby
+      
+      ; --- weaving / replication ---
+      weave   SPL.B   2,      0        ; two processes: one keeps scanning, one weaves
+              JMP.A   scan,   0        ; process 1 returns to scanning
+              MOV.I   imp,    gate+gap  ; process 2 seeds an imp a bit away from gate
+              MOV.I   imp,    gate+gap+1
+              MOV.I   imp,    gate+gap+2
+              JMP.A   gate+gap, 0      ; run the little imp-chain from the safe area
+      
+              END
+      ```
+    llm_response:
+      ```redcode
+      ;redcode
+      ;name          Lantern Weaver (mutated)
+      ;author        ChatGPT
+      ;strategy      Faster, safer scanner + stronger hit routine:
+      ;strategy      - Uses a quickscan-style loop: probe, skip-hit, otherwise bomb.
+      ;strategy      - Drops a classic SPL/DAT pit (harder to escape than MOV #0,<0).
+      ;strategy      - Keeps scanning after hits (no expensive mode switch into weaving).
+      ;strategy      - Adds a simple self-gate to reduce being overrun by imps.
+      
+              ORG     start
+      
+      step    EQU     43              ; scan stride (pick a different coprime-ish step)
+      gateo   EQU     -7              ; gate offset relative to 'start' area
+      
+      ptr     DAT.F   #0,     #0      ; B-field walked by scanner
+      
+      ; --- payloads ---
+      snare   SPL.B   #0,     <0      ; split victims into a predecrement pit
+      pit     DAT.F   #0,     #0      ; DAT bombs to actually kill trapped processes
+      wipe    MOV.I   pit,    >ptr    ; helper for laying a small DAT trail on hit
+      
+      ; --- entry / local gate ---
+      start   MOV.I   pit,    start+gateo ; local DAT gate (helps vs. imp rings)
+      scan    ADD.AB  #step,  ptr         ; advance scan pointer
+              SEQ.I   pit,    @ptr        ; if target is DAT 0,0 then it's probably empty
+              JMP.A   hit,     0          ; otherwise, we saw something -> attack
+              JMP.A   scan,    0          ; keep scanning
+      
+      ; --- hit routine: snare + kill, then resume scanning ---
+      hit     MOV.I   snare,  @ptr        ; plant SPL pit at target
+              MOV.I   pit,    <ptr        ; plant DAT just behind (catches backtracking)
+              MOV.I   pit,    @ptr        ; overwrite target with DAT soon after split
+              MOV.I   pit,    @ptr        ; reinforce (helps vs. replicators repairing)
+              JMP.A   scan,    0          ; do not stall: continue scanning immediately
+      
+              END
+      ```
+    warrior.name: Lantern Weaver (mutated)
+    warrior.author: ChatGPT
+    warrior.start: 4
+    warrior.instructions: (14)
+      [0] DAT.F  #     0, #     0
+      [1] SPL.B  #     0, <     0
+      [2] DAT.F  #     0, #     0
+      [3] MOV.I  $    -1, >    -3
+      [4] MOV.I  $    -2, $    -7
+      [5] ADD.AB #    43, $    -5
+      [6] SEQ.I  $    -4, @    -6
+      [7] JMP.A  $     2, $     0
+      [8] JMP.A  $    -3, $     0
+      [9] MOV.I  $    -8, @    -9
+      [10] MOV.I  $    -8, <   -10
+      [11] MOV.I  $    -9, @   -11
+      [12] MOV.I  $   -10, @   -12
+      [13] JMP.A  $    -8, $     0
