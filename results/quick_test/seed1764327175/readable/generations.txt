@@ -1,0 +1,2146 @@
+[Generations]
+
+
+Gen 0 (new_warrior): 8 warriors
+
+  --- Warrior 0.0 ---
+  id: e93ba97c6e8e11d23027466455d8d4e287b9844229b3a2e59a9d47341eaf55d0
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name        Echo Garden
+    ;author      chatgpt
+    ;strategy    A small "garden" of self-checking replicators:
+    ;strategy    - Splits into two roles: a paper replicator and a light scanner.
+    ;strategy    - Paper copies a short bundle to a new spot each generation.
+    ;strategy    - Scanner throws spaced DAT bombs when it sees non-zero activity.
+    ;strategy    - Each copy leaves a tiny decoy trail behind it.
+    
+            ORG     start
+    
+    step    EQU     197              ; relatively prime-ish to many coresizes
+    gap     EQU     23
+    
+    ; --- bootstrap / split roles ---
+    start   SPL.B   paper,   #0       ; start paper in a new process
+            SPL.B   scan,    #0       ; start scanner in another process
+            JMP.B   paper,   #0       ; main falls into paper too
+    
+    ; --- paper: copy a small block forward, then jump into it ---
+    ; We use a pointer instruction 'ptr' whose B-field advances by step.
+    paper   ADD.AB  #step,   ptr      ; advance destination pointer
+            MOV.I   bundle,  @ptr     ; copy bundle instruction 0
+            MOV.I   bundle+1,@ptr     ; copy bundle instruction 1
+            MOV.I   bundle+2,@ptr     ; copy bundle instruction 2
+            MOV.I   bundle+3,@ptr     ; copy bundle instruction 3
+            MOV.I   bundle+4,@ptr     ; copy bundle instruction 4
+            MOV.I   bundle+5,@ptr     ; copy bundle instruction 5
+            MOV.I   bundle+6,@ptr     ; copy bundle instruction 6
+            MOV.I   bundle+7,@ptr     ; copy bundle instruction 7
+            MOV.I   decoy,   <ptr     ; leave a decoy just before the copy
+            JMP.B   @ptr,     #0      ; jump to the freshly planted copy
+    
+    ; destination pointer (B-field holds the moving target)
+    ptr     DAT.F   #0,      #400
+    
+    ; the replicated bundle: small, self-contained, and re-enters at start of bundle
+    bundle  SPL.B   bundle+2,#0       ; keep multiple processes alive
+            MOV.I   >ptr,    >ptr     ; harmless churn / slight anti-imp feel
+            JMP.B   paper,   #0       ; continue replicating from new location
+            DAT.F   #0,      #0       ; padding / disrupt linear patterns
+            MOV.I   decoy,   {ptr     ; smear decoys using predecrement A-indirect
+            JMP.B   bundle,  #0       ; loop inside bundle
+            DAT.F   #0,      #0       ; padding
+            NOP.F   #0,      #0       ; padding
+    
+    decoy   DAT.F   #0,      #0       ; decoy cell (looks like core init)
+    
+    ; --- scanner: probe forward; if something isn't zero-ish, bomb it ---
+    ; Uses a moving probe 'probe' and SNE against a known DAT.
+    scan    ADD.AB  #gap,    probe    ; move probe along
+            SNE.I   @probe,  decoy    ; if not equal to a clean DAT, assume target
+            JMP.B   scan,    #0       ; otherwise keep scanning
+            MOV.I   bomb,    @probe   ; overwrite suspicious location
+            JMP.B   scan,    #0
+    
+    probe   DAT.F   #0,      #250     ; probe pointer in B-field
+    bomb    DAT.F   #0,      #0       ; simple DAT bomb (kills processes)
+    
+            END
+    ```
+  warrior.name: Echo Garden
+  warrior.author: chatgpt
+  warrior.start: 0
+  warrior.instructions: (31)
+    [0] SPL.B  $     3, #     0
+    [1] SPL.B  $    23, #     0
+    [2] JMP.B  $     1, #     0
+    [3] ADD.AB #   197, $    11
+    [4] MOV.I  $    11, @    10
+    [5] MOV.I  $    11, @     9
+    [6] MOV.I  $    11, @     8
+    [7] MOV.I  $    11, @     7
+    [8] MOV.I  $    11, @     6
+    [9] MOV.I  $    11, @     5
+    [10] MOV.I  $    11, @     4
+    [11] MOV.I  $    11, @     3
+    [12] MOV.I  $    11, <     2
+    [13] JMP.B  @     1, #     0
+    [14] DAT.F  #     0, #   400
+    [15] SPL.B  $     2, #     0
+    [16] MOV.I  >    -2, >    -2
+    [17] JMP.B  $   -14, #     0
+    [18] DAT.F  #     0, #     0
+    [19] MOV.I  $     4, {    -5
+    [20] JMP.B  $    -5, #     0
+    [21] DAT.F  #     0, #     0
+    [22] NOP.F  #     0, #     0
+    [23] DAT.F  #     0, #     0
+    [24] ADD.AB #    23, $     5
+    [25] SNE.I  @     4, $    -2
+    [26] JMP.B  $    -2, #     0
+    [27] MOV.I  $     3, @     2
+    [28] JMP.B  $    -4, #     0
+    [29] DAT.F  #     0, #   250
+    [30] DAT.F  #     0, #     0
+
+  --- Warrior 0.1 ---
+  id: e1f6448ca9ba65dbf9aaf6f36e34b5134504df8072f7b4b80f8b32f3a68c9b5f
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Paper Lantern
+    ;author        ChatGPT
+    ;strategy      A compact replicator ("paper") that spreads copies while
+    ;strategy      scattering decoy bombs. Uses a small boot so the main body
+    ;strategy      runs away from the entry point, then replicates repeatedly.
+    ;strategy      Not tuned for any specific hill—meant to be creative and valid.
+    
+            ORG     start
+    
+    step    EQU     193        ; replication stride (arbitrary, coresize-dependent but valid)
+    boot    EQU     29         ; distance to boot the working copy away from start
+    gap     EQU     7          ; small spacing used by the decoy scatter
+    
+    ; --- Entry / boot: copy the engine a short distance away, then jump into it ---
+    start   mov.i   engine,     engine+boot     ; boot first instruction of engine
+            mov.i   engine+1,   engine+1+boot
+            mov.i   engine+2,   engine+2+boot
+            mov.i   engine+3,   engine+3+boot
+            mov.i   engine+4,   engine+4+boot
+            jmp.a   engine+boot                  ; execute from the booted copy
+    
+    ; --- Engine: replicate self and sprinkle decoys ---
+    engine  spl.a   1,          0                ; split so one process keeps lanterns afloat
+            add.ab  #step,      ptr              ; advance destination pointer
+            mov.i   engine,     @ptr             ; copy engine block...
+            mov.i   engine+1,   @ptr
+            mov.i   engine+2,   @ptr
+            mov.i   engine+3,   @ptr
+            mov.i   engine+4,   @ptr
+            mov.i   bomb,       @ptr             ; leave a "wick" (bomb) near the fresh copy
+            add.ab  #gap,       ptr              ; offset a bit
+            mov.i   decoy,      @ptr             ; scatter a decoy instruction
+            jmp.a   engine,     0                ; loop: keep replicating and scattering
+    
+    ; Pointer cell: B-field is used as an address accumulator via ADD.AB
+    ptr     dat.f   #0,         #0
+    
+    ; Payloads
+    bomb    dat.f   #0,         #0               ; simple DAT bomb (kills processes that hit it)
+    decoy   mov.i   #0,         1                ; harmless-looking decoy (acts like a tiny imp-ish move)
+    
+            END
+    ```
+  warrior.name: Paper Lantern
+  warrior.author: ChatGPT
+  warrior.start: 0
+  warrior.instructions: (20)
+    [0] MOV.I  $     6, $    35
+    [1] MOV.I  $     6, $    35
+    [2] MOV.I  $     6, $    35
+    [3] MOV.I  $     6, $    35
+    [4] MOV.I  $     6, $    35
+    [5] JMP.A  $    30, $     0
+    [6] SPL.A  $     1, $     0
+    [7] ADD.AB #   193, $    10
+    [8] MOV.I  $    -2, @     9
+    [9] MOV.I  $    -2, @     8
+    [10] MOV.I  $    -2, @     7
+    [11] MOV.I  $    -2, @     6
+    [12] MOV.I  $    -2, @     5
+    [13] MOV.I  $     5, @     4
+    [14] ADD.AB #     7, $     3
+    [15] MOV.I  $     4, @     2
+    [16] JMP.A  $   -10, $     0
+    [17] DAT.F  #     0, #     0
+    [18] DAT.F  #     0, #     0
+    [19] MOV.I  #     0, $     1
+
+  --- Warrior 0.2 ---
+  id: d8b74ce6f88c9f1b1f9459d6d45a361cc517285b23020149b52530e294701b08
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Prism Weaver
+    ;author        ChatGPT
+    ;strategy      A "prism" hybrid: quick self-splitting scanner that alternates
+    ;strategy      between (1) probing core for non-empty cells and (2) launching
+    ;strategy      a small imp-ring. On a hit it drops a short DAT carpet nearby.
+    ;strategy
+    ;strategy      Notes:
+    ;strategy      - The scanner uses SNE against an assumed empty cell (DAT.F 0,0).
+    ;strategy      - It advances by an odd step to cover core broadly.
+    ;strategy      - When it detects something non-zero, it bombs a small span.
+    ;strategy      - Meanwhile, a separate process starts a 3-point imp ring.
+    ;
+    ;assert        CORESIZE > 100
+    
+            ORG     start
+    
+    step    EQU     97              ; odd stride for broad coverage
+    
+    start   SPL.B   impboot         ; fork: one process builds imps
+    scan    ADD.AB  #step, ptr      ; advance probe pointer
+            SNE.I   @ptr, empty     ; is target not empty (DAT 0,0)?
+            JMP.B   scan            ; if empty, keep scanning
+    hit     MOV.I   bomb,  @ptr     ; drop a bomb on/near the found location
+            MOV.I   bomb,  <ptr     ; then a couple more nearby (predec trail)
+            MOV.I   bomb,  <ptr
+            JMP.B   scan            ; resume scanning
+    
+    ; pointer cell used by scanner (B-field holds the evolving target offset)
+    ptr     DAT.F   #0,     #0
+    
+    ; bomb payload: a process-killing DAT with a distinctive pattern
+    bomb    DAT.F   #0,     #33
+    
+    ; "empty cell" reference for comparison
+    empty   DAT.F   #0,     #0
+    
+    ; --- imp ring bootstrap ---
+    ; Build a tiny 3-point imp ring at a safe distance, then jump into it.
+    impboot SPL.B   impboot2
+            MOV.I   imp,    imp1
+            MOV.I   imp,    imp2
+            MOV.I   imp,    imp3
+            JMP.B   imp1
+    
+    impboot2 JMP.B  scan             ; second bootstrap process returns to scanning
+    
+    ; 3-point imp ring (spacing 1 here; the ring is created by multiple entry points)
+    imp     MOV.I   0,      1
+    imp1    JMP.B   imp
+    imp2    JMP.B   imp
+    imp3    JMP.B   imp
+    
+            END
+    ```
+  warrior.name: Prism Weaver
+  warrior.author: ChatGPT
+  warrior.start: 0
+  warrior.instructions: (21)
+    [0] SPL.B  $    11, $     0
+    [1] ADD.AB #    97, $     7
+    [2] SNE.I  @     6, $     8
+    [3] JMP.B  $    -2, $     0
+    [4] MOV.I  $     5, @     4
+    [5] MOV.I  $     4, <     3
+    [6] MOV.I  $     3, <     2
+    [7] JMP.B  $    -6, $     0
+    [8] DAT.F  #     0, #     0
+    [9] DAT.F  #     0, #    33
+    [10] DAT.F  #     0, #     0
+    [11] SPL.B  $     5, $     0
+    [12] MOV.I  $     5, $     6
+    [13] MOV.I  $     4, $     6
+    [14] MOV.I  $     3, $     6
+    [15] JMP.B  $     3, $     0
+    [16] JMP.B  $   -15, $     0
+    [17] MOV.I  $     0, $     1
+    [18] JMP.B  $    -1, $     0
+    [19] JMP.B  $    -2, $     0
+    [20] JMP.B  $    -3, $     0
+
+  --- Warrior 0.3 ---
+  id: c15f153da518ef773a586bf11731b11ae3c1bda7ebbe202bf0408f42e1827ba2
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          lantern weave
+    ;author        chatgpt
+    ;strategy      A small "lantern" scanner that sweeps core and drops a SPL/DAT trap,
+    ;strategy      then falls back into a tiny imp-ish replicator to stay alive.
+    ;strategy      Creative hybrid: scan -> trap -> scatter -> slide.
+    
+            ORG     start
+    
+    step    EQU     29              ; scan stride (co-prime-ish to many coresizes)
+    hop     EQU     97              ; relocation hop for the replicator
+    
+    ; --- scan state / pointers ---
+    ptr     DAT.F   #0,     #step   ; B-field is the moving scan offset
+    bomb    DAT.F   >-1,    >-1     ; generic DAT bomb (postincrement makes it "smear")
+    trap    SPL.B   #0,     #0      ; process-splitting trap (slows/overloads opponents)
+    
+    ; --- replicator seed (copied elsewhere later) ---
+    seed    MOV.I   0,      1       ; tiny imp-like instruction used after relocation
+    
+    ; --- main loop ---
+    start   ADD.AB  #step,  ptr     ; advance scan pointer
+            SNE.I   @ptr,   bomb    ; if target isn't already bomb-like, do something
+            JMP.B   start,  #0      ; otherwise keep sweeping
+    
+            MOV.I   trap,   @ptr    ; lay a SPL trap at the detected location
+            MOV.I   bomb,   >ptr    ; follow with a DAT smear nearby
+            MOV.I   bomb,   >ptr    ; and another to widen the net
+    
+            ; relocate a tiny "afterlife" loop to a far area to survive counterattacks
+            MOV.I   seed,   hop     ; place seed at (PC + hop)
+            JMP.B   hop,    #0      ; jump to the relocated seed
+    
+            ; (never reached) fallback
+            DAT.F   #0,     #0
+    
+            END
+    ```
+  warrior.name: lantern weave
+  warrior.author: chatgpt
+  warrior.start: 4
+  warrior.instructions: (13)
+    [0] DAT.F  #     0, #    29
+    [1] DAT.F  >    -1, >    -1
+    [2] SPL.B  #     0, #     0
+    [3] MOV.I  $     0, $     1
+    [4] ADD.AB #    29, $    -4
+    [5] SNE.I  @    -5, $    -4
+    [6] JMP.B  $    -2, #     0
+    [7] MOV.I  $    -5, @    -7
+    [8] MOV.I  $    -7, >    -8
+    [9] MOV.I  $    -8, >    -9
+    [10] MOV.I  $    -7, $    97
+    [11] JMP.B  $    97, #     0
+    [12] DAT.F  #     0, #     0
+
+  --- Warrior 0.4 ---
+  id: a8ec8bd66c3f386a69ab2d88d3f5dec3568b54ec7694a9c03dc13f8695e397fe
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Lattice Lantern
+    ;author        ChatGPT
+    ;strategy      A small "lantern" that lights the core with a moving gate:
+    ;strategy      - split into two tasks
+    ;strategy      - one task lays a spaced carpet of DAT bombs
+    ;strategy      - the other maintains a short self-centered gate to trip imps
+    ;strategy      Not meant to be optimal—just a creative, valid warrior.
+    
+            ORG     start
+    
+    step    EQU     37              ; bombing stride (relatively prime to many coresizes)
+    gap     EQU     11              ; secondary offset to vary the pattern
+    
+    bomb    DAT.F   #0,     #0      ; simple kill bomb (kills any process executing it)
+    
+    ; pointers used by the bomber
+    ptr     DAT.F   #0,     #step   ; B-field is the main moving pointer
+    
+    ; gate is a tiny trap near our code: keeps rewriting a JMP 0 style snare
+    gate    DAT.F   #0,     #0
+    
+    start   SPL.B   gatejob, #0     ; fork: one process bombs, the other maintains the gate
+    
+    ; --- Bomber process: walks through core in a "lattice" pattern and drops DATs ---
+    bombjob ADD.AB  #step,  ptr     ; advance pointer by step
+            MOV.I   bomb,   @ptr    ; bomb at the indirected target
+            ADD.B   #gap,   ptr     ; add a small wobble to the B-field to avoid simple mirrors
+            JMP.B   bombjob, #0     ; loop forever
+    
+    ; --- Gate process: repeatedly rebuilds a small local gate to snag imps/linear scanners ---
+    gatejob MOV.I   gins,   gate    ; refresh gate instruction (in case overwritten)
+            MOV.I   gins,   gate+1  ; make the gate two-cells wide
+            JMP.B   gatejob, #0     ; keep maintaining
+    
+    gins    JMP.B   -1,     #0      ; when executed, loops on itself (process trap)
+    
+            END
+    ```
+  warrior.name: Lattice Lantern
+  warrior.author: ChatGPT
+  warrior.start: 3
+  warrior.instructions: (12)
+    [0] DAT.F  #     0, #     0
+    [1] DAT.F  #     0, #    37
+    [2] DAT.F  #     0, #     0
+    [3] SPL.B  $     5, #     0
+    [4] ADD.AB #    37, $    -3
+    [5] MOV.I  $    -5, @    -4
+    [6] ADD.B  #    11, $    -5
+    [7] JMP.B  $    -3, #     0
+    [8] MOV.I  $     3, $    -6
+    [9] MOV.I  $     2, $    -6
+    [10] JMP.B  $    -2, #     0
+    [11] JMP.B  $    -1, #     0
+
+  --- Warrior 0.5 ---
+  id: 8124e8e6beb1b77402d24bb3901cfa315bf6534a9a1dfe507612b1af658fac15
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Paper Lantern
+    ;author        assistant
+    ;strategy      A small "paper" replicator that drops alternating decoy/kill cells.
+    ;strategy      It quickly splits, copies a short body to a new location, then
+    ;strategy      launches from there. While copying, it leaves a lantern-trail:
+    ;strategy      a DAT bomb followed by a harmless decoy MOV, which can mislead
+    ;strategy      simple scanners and slow down imps.
+    
+            ORG     start
+    
+    step    EQU     197             ; relatively prime-ish to many common coresizes
+    
+    ; --- templates used by the replicator ---
+    bomb    DAT.F   #0,     #0      ; kill cell
+    decoy   MOV.I   $0,     $1      ; harmless "imp-like" decoy (copies itself forward)
+    
+    ; --- pointers/counters ---
+    dst     DAT.F   #0,     #step   ; B-field holds current destination offset
+    cnt     DAT.F   #0,     #10     ; how many instructions to copy (body length)
+    
+    ; --- paper body ---
+    start   SPL.B   $1,     $0      ; create a second process to speed up replication
+            ADD.AB  #step,  dst     ; move destination forward each generation
+            MOV.I   bomb,   @dst    ; lantern trail part 1: drop a DAT at destination
+            ADD.AB  #1,     dst
+            MOV.I   decoy,  @dst    ; lantern trail part 2: drop a decoy right after
+            ADD.AB  #1,     dst
+    
+    copy    MOV.I   @src,   @dst    ; copy one instruction from source to destination
+            ADD.AB  #1,     src     ; advance source pointer
+            ADD.AB  #1,     dst     ; advance destination pointer
+            DJN.B   copy,   cnt     ; loop for 'body length' instructions
+    
+            JMP.B   @launch, $0     ; jump into the newly-copied body (computed below)
+    
+    ; --- source/launch helpers ---
+    src     DAT.F   #0,     #start  ; B-field points at first instruction to copy
+    launch  DAT.F   #0,     #0      ; patched by copy progression implicitly via dst
+    
+    ; --- filler to make the copied region self-contained (kept within the 10 lines) ---
+            NOP     $0,     $0
+            NOP     $0,     $0
+            END
+    ```
+  warrior.name: Paper Lantern
+  warrior.author: assistant
+  warrior.start: 4
+  warrior.instructions: (19)
+    [0] DAT.F  #     0, #     0
+    [1] MOV.I  $     0, $     1
+    [2] DAT.F  #     0, #   197
+    [3] DAT.F  #     0, #    10
+    [4] SPL.B  $     1, $     0
+    [5] ADD.AB #   197, $    -3
+    [6] MOV.I  $    -6, @    -4
+    [7] ADD.AB #     1, $    -5
+    [8] MOV.I  $    -7, @    -6
+    [9] ADD.AB #     1, $    -7
+    [10] MOV.I  @     5, @    -8
+    [11] ADD.AB #     1, $     4
+    [12] ADD.AB #     1, $   -10
+    [13] DJN.B  $    -3, $   -10
+    [14] JMP.B  @     2, $     0
+    [15] DAT.F  #     0, #   -11
+    [16] DAT.F  #     0, #     0
+    [17] NOP.F  $     0, $     0
+    [18] NOP.F  $     0, $     0
+
+  --- Warrior 0.6 ---
+  id: 1fa299c6ef4819b82e4205f9923df1848ee385aacd23cb7c0a36343072271269
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Mirror Garden
+    ;author        ChatGPT
+    ;strategy      A small “mirror” bomber:
+    ;strategy      1) Builds a tiny decoy by copying a few instructions forward.
+    ;strategy      2) Enters a scanning loop looking for non-zero instructions.
+    ;strategy      3) When something is found, it drops a SPL/DAT pair as a trap,
+    ;strategy         then keeps moving, leaving a spreading patch of disruption.
+    ;strategy      Not optimized for any specific hill; intended to be creative and valid.
+    
+            ORG     start
+    
+    step    EQU     17              ; scan stride (co-prime-ish for many cores)
+    span    EQU     60              ; where we copy a small decoy block
+    
+    ; A simple bomb pair: a process-split trap followed by a DAT to kill processes.
+    bomb    SPL.B   #0,     #0
+            DAT.F   #0,     #0
+    
+    ; Pointer cells (used as indirect targets)
+    scanptr DAT.F   #0,     #step    ; B-field advances by step each scan
+    decptr  DAT.F   #span,  #0       ; points to where we copy the decoy
+    
+    start   MOV.I   seed,   @decptr  ; copy a “seed” instruction into the decoy area
+            ADD.AB  #1,     decptr   ; advance decoy pointer
+            MOV.I   seed2,  @decptr  ; copy second seed instruction
+            ADD.AB  #1,     decptr
+            MOV.I   seed3,  @decptr  ; copy third seed instruction
+            SPL.B   decoy,  #0       ; run the decoy in parallel
+            JMP.A   scan,   #0       ; main task goes scanning
+    
+    ; The decoy just wanders and writes harmless-looking instructions nearby.
+    decoy   MOV.I   seed3,  >decptr  ; dribble a copy (postincrement via B-indirect)
+            JMP.A   decoy,  #0
+    
+    ; Scanner: look at the core with a fixed stride.
+    ; If the scanned instruction is DAT 0,0 we consider it "empty-ish" and keep going.
+    scan    SEQ.I   empty,  @scanptr ; compare target cell with DAT 0,0
+            JMP.A   hit,    #0       ; if not equal, something interesting found
+            ADD.AB  #step,  scanptr  ; otherwise advance pointer
+            JMP.A   scan,   #0
+    
+    ; Hit routine: plant a SPL trap and a DAT at the discovered location (and next cell).
+    hit     MOV.I   bomb,   @scanptr ; place SPL #0,#0 at target
+            MOV.I   bomb+1, @scanptr+1 ; place DAT right after it
+            ADD.AB  #step,  scanptr  ; keep moving so we don't stall on one place
+            JMP.A   scan,   #0
+    
+    ; Seeds: chosen to look plausible and to keep decoy from being an obvious DAT trail.
+    seed    MOV.I   0,      1
+    seed2   ADD.AB  #1,     scanptr
+    seed3   JMP.A   -1,     #0
+    
+    empty   DAT.F   #0,     #0
+    
+            END
+    ```
+  warrior.name: Mirror Garden
+  warrior.author: ChatGPT
+  warrior.start: 4
+  warrior.instructions: (25)
+    [0] SPL.B  #     0, #     0
+    [1] DAT.F  #     0, #     0
+    [2] DAT.F  #     0, #    17
+    [3] DAT.F  #    60, #     0
+    [4] MOV.I  $    17, @    -1
+    [5] ADD.AB #     1, $    -2
+    [6] MOV.I  $    16, @    -3
+    [7] ADD.AB #     1, $    -4
+    [8] MOV.I  $    15, @    -5
+    [9] SPL.B  $     2, #     0
+    [10] JMP.A  $     3, #     0
+    [11] MOV.I  $    12, >    -8
+    [12] JMP.A  $    -1, #     0
+    [13] SEQ.I  $    11, @   -11
+    [14] JMP.A  $     3, #     0
+    [15] ADD.AB #    17, $   -13
+    [16] JMP.A  $    -3, #     0
+    [17] MOV.I  $   -17, @   -15
+    [18] MOV.I  $   -17, @   -15
+    [19] ADD.AB #    17, $   -17
+    [20] JMP.A  $    -7, #     0
+    [21] MOV.I  $     0, $     1
+    [22] ADD.AB #     1, $   -20
+    [23] JMP.A  $    -1, #     0
+    [24] DAT.F  #     0, #     0
+
+  --- Warrior 0.7 ---
+  id: 20e4c4f709a650d701546052a8b69c8c7c0637f4808881d24fc6a49c5fe69283
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Windmill Garden
+    ;author        ChatGPT
+    ;strategy      A small hybrid: quick self-splitting "windmill" that lays a
+    ;strategy      rotating DAT bomb ring while leaving behind a tiny decoy trail.
+    ;strategy      Not a top-tier warrior, but it’s lively and valid ICWS'94 style.
+    
+            ORG     start
+    
+    step    EQU     37          ; ring stride (co-prime-ish to common coresizes)
+    gap     EQU     9           ; spacing used for decoy scribbles
+    
+    bomb    DAT.F   #0,     #0  ; the "petal": simple DAT bomb
+    
+    ptr     DAT.F   #0,     #0  ; bombing pointer (B-field used as offset)
+    dptr    DAT.F   #0,     #0  ; decoy pointer (B-field used as offset)
+    
+    start   SPL.B   spinner, #0         ; spawn the windmill core
+            SPL.B   gardener, #0        ; spawn the ring-bomber
+            JMP.B   decoy,    #0        ; main thread goes paint decoys
+    
+    ; --- Thread 1: the windmill spinner ---
+    ; Keeps two processes circling a tiny loop so the warrior doesn't collapse
+    ; immediately if one task gets hit.
+    spinner SPL.B   2,        #0
+            JMP.B   spinner,  #0
+    
+    ; --- Thread 2: the gardener (ring bomber) ---
+    ; Advances ptr by step and drops a DAT at @ptr (B-indirect through ptr).
+    gardener ADD.AB  #step,    ptr
+            MOV.I    bomb,     @ptr
+            JMP.B    gardener, #0
+    
+    ; --- Thread 3: decoy painter ---
+    ; Smears harmless MOV instructions in a spaced line to confuse simple scanners.
+    decoy   ADD.AB  #gap,     dptr
+            MOV.I   dec,      @dptr
+            JMP.B   decoy,    #0
+    
+    dec     MOV.I   #0,       $0        ; harmless-ish "do nothing" copy-bait
+    
+            END
+    ```
+  warrior.name: Windmill Garden
+  warrior.author: ChatGPT
+  warrior.start: 3
+  warrior.instructions: (15)
+    [0] DAT.F  #     0, #     0
+    [1] DAT.F  #     0, #     0
+    [2] DAT.F  #     0, #     0
+    [3] SPL.B  $     3, #     0
+    [4] SPL.B  $     4, #     0
+    [5] JMP.B  $     6, #     0
+    [6] SPL.B  $     2, #     0
+    [7] JMP.B  $    -1, #     0
+    [8] ADD.AB #    37, $    -7
+    [9] MOV.I  $    -9, @    -8
+    [10] JMP.B  $    -2, #     0
+    [11] ADD.AB #     9, $    -9
+    [12] MOV.I  $     2, @   -10
+    [13] JMP.B  $    -2, #     0
+    [14] MOV.I  #     0, $     0
+
+Gen 1 (new_warrior): 1 warriors
+
+  --- Warrior 0.0 ---
+  id: 13ff886d75039ea32d5d66deb8a56775853bf441acee396a0e090e4a0601d68e
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Mirror Maze
+    ;author        ChatGPT
+    ;strategy      A small "vampire-lite" that lays a self-repairing JMP-trap,
+    ;strategy      points victims into a tiny SPL/DAT pit, and keeps moving the
+    ;strategy      trap forward with a post-increment pointer. Includes a simple
+    ;strategy      coreclear-ish carpet after the trap is established.
+    
+            ORG     start
+    
+    step    EQU     97              ; relatively prime-ish step for scattering
+    gateofs EQU     25              ; where the trap body is placed (relative)
+    pitofs  EQU     40              ; where the SPL/DAT pit sits
+    
+    ; pointer cells (modified during runtime)
+    ptr     DAT.F   #gateofs, #gateofs   ; post-incremented pointer to place traps
+    clrptr  DAT.F   #0,      #0          ; pointer used by the late carpet
+    
+    ; --- main ---
+    start   MOV.I   gate,     >ptr    ; drop a JMP trap, advance ptr (B-postinc)
+            ADD.AB  #step,    ptr     ; move trap placement ahead by 'step'
+            MOV.I   pit,      gateofs ; refresh the trap body (self-repair)
+            MOV.I   pit+1,    gateofs+1
+            MOV.I   pit+2,    gateofs+2
+            MOV.I   pit+3,    gateofs+3
+            SNE.I   #0,       ptr     ; quick "always true" shape check
+            JMP.A   start             ; loop placing traps
+    
+    ; --- trap body (copied out repeatedly) ---
+    ; The trap sends anything that executes it into the pit area.
+    gate    JMP.A   pitofs,   0       ; victim redirected into our pit
+    
+    ; --- pit ---
+    ; Split the victim into multiple processes, then kill them.
+    pit     SPL.A   2,        0
+            SPL.A   2,        0
+            DAT.F   #0,       #0
+            DAT.F   #0,       #0
+    
+    ; --- (optional) carpet/clear if we ever fall through (rare) ---
+    clear   MOV.I   bomb,     >clrptr
+            DJN.B   clear,    #2000
+            JMP.A   start,    0
+    
+    bomb    DAT.F   #0,       #0
+    
+            END
+    ```
+  warrior.name: Mirror Maze
+  warrior.author: ChatGPT
+  warrior.start: 2
+  warrior.instructions: (19)
+    [0] DAT.F  #    25, #    25
+    [1] DAT.F  #     0, #     0
+    [2] MOV.I  $     8, >    -2
+    [3] ADD.AB #    97, $    -3
+    [4] MOV.I  $     7, $    25
+    [5] MOV.I  $     7, $    26
+    [6] MOV.I  $     7, $    27
+    [7] MOV.I  $     7, $    28
+    [8] SNE.I  #     0, $    -8
+    [9] JMP.A  $    -7, $     0
+    [10] JMP.A  $    40, $     0
+    [11] SPL.A  $     2, $     0
+    [12] SPL.A  $     2, $     0
+    [13] DAT.F  #     0, #     0
+    [14] DAT.F  #     0, #     0
+    [15] MOV.I  $     3, >   -14
+    [16] DJN.B  $    -1, #  2000
+    [17] JMP.A  $   -15, $     0
+    [18] DAT.F  #     0, #     0
+
+Gen 2 (new_warrior): 8 warriors
+
+  --- Warrior 0.0 ---
+  id: 2c3ee1d2e9b34395cae8e7487c0d768d1a8f68ad25f700b06890e1ce57776b01
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Kaleidoscope Gate
+    ;author        chatgpt
+    ;strategy      A small "gate + carpet" warrior:
+    ;              1) Build a JMP-gate around the body to trap imps/processes.
+    ;              2) Start a two-process stone that drops SPL/DAT "carpet" bombs
+    ;                 in a hopping pattern.
+    ;              3) Keep a simple self-check so we don't bomb our own gate.
+    
+            ORG     start
+    
+    step    EQU     97              ; hop distance (co-prime-ish to many coresizes)
+    span    EQU     13              ; gate half-width
+    
+    start   SPL.B   bomber,   #0     ; split: one process bombs, one builds/guards
+    guard   MOV.I   gatejmp,  <gate  ; lay a JMP gate backwards (predecrement)
+            DJN.B   guard,    #span  ; build 'span' copies
+            JMP.B   sweep,    #0     ; then start sweeping (light maintenance)
+    
+    ; --- bomber: hops a pointer and drops a "carpet" that is annoying to execute ---
+    bomber  ADD.AB  #step,    ptr    ; advance target pointer
+            SNE.I   gatejmp,  @ptr   ; avoid overwriting gate cells (cheap test)
+            MOV.I   carpet,   @ptr   ; drop SPL/DAT carpet bomb
+            MOV.I   carpet,   *ptr   ; also bomb using A-indirect for variation
+            JMP.B   bomber,   #0
+    
+    ; --- sweep: keeps the gate alive and adds a few extra DATs near it ---
+    sweep   MOV.I   gatedat,  gate   ; reinforce a DAT at the gate anchor
+            MOV.I   gatejmp,  <gate  ; refresh one JMP in the gate
+            JMP.B   sweep,    #0
+    
+    ; --- data / templates ---
+    ptr     DAT.F   #0,       #200   ; B-field is our evolving pointer base
+    gate    DAT.F   #0,       #0     ; gate anchor (used with <gate)
+    gatejmp JMP.B   -1,       #0     ; the gate: processes landing here loop back
+    gatedat DAT.F   #0,       #0     ; hard kill cell (helps against scanners)
+    
+    ; carpet bomb: SPL to multiply enemy tasks, then DAT to kill (when hit later)
+    carpet  SPL.B   #0,       #0
+    
+            END
+    ```
+  warrior.name: Kaleidoscope Gate
+  warrior.author: chatgpt
+  warrior.start: 0
+  warrior.instructions: (17)
+    [0] SPL.B  $     4, #     0
+    [1] MOV.I  $    13, <    12
+    [2] DJN.B  $    -1, #    13
+    [3] JMP.B  $     6, #     0
+    [4] ADD.AB #    97, $     8
+    [5] SNE.I  $     9, @     7
+    [6] MOV.I  $    10, @     6
+    [7] MOV.I  $     9, *     5
+    [8] JMP.B  $    -4, #     0
+    [9] MOV.I  $     6, $     4
+    [10] MOV.I  $     4, <     3
+    [11] JMP.B  $    -2, #     0
+    [12] DAT.F  #     0, #   200
+    [13] DAT.F  #     0, #     0
+    [14] JMP.B  $    -1, #     0
+    [15] DAT.F  #     0, #     0
+    [16] SPL.B  #     0, #     0
+
+  --- Warrior 0.1 ---
+  id: a9283c89b0e0d0df2c45578d24dc751082b89e0750609768048b02f7ed800bbf
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          prism waltz
+    ;author        assistant
+    ;strategy      A compact "prism" replicator:
+    ;              - splits into two processes
+    ;              - each process copies a small template to a new location
+    ;              - drops a trailing DAT bomb to annoy pursuit
+    ;              Not intended as a top-tier warrior; just a creative, valid one.
+    
+            ORG     start
+    
+    step    EQU     233        ; separation between generations (tune for your core)
+    len     EQU     12         ; number of instructions to copy (template size)
+    
+    start   SPL.B   1,      0          ; create a second process; both run the same code
+            MOV.AB  #step,  dst        ; initialize destination pointer (relative)
+            MOV.AB  #len,   cnt        ; initialize copy counter
+    copy    MOV.I   @src,   @dst       ; copy one instruction from template to destination
+            ADD.AB  #1,     src        ; advance source pointer
+            ADD.AB  #1,     dst        ; advance destination pointer
+            DJN.B   copy,   cnt        ; loop until len copied
+            MOV.I   bomb,   @dst       ; drop a trailing bomb right after the copy
+            JMP.B   @jump,  0          ; jump into the freshly copied program
+    
+    ; --- runtime pointers/counters (self-modifying pointers via AB/B fields) ---
+    src     DAT.F   0,      template   ; B-field holds source offset
+    dst     DAT.F   0,      0          ; B-field becomes destination offset
+    cnt     DAT.F   0,      0          ; B-field is loop counter
+    jump    DAT.F   0,      template   ; B-field points at entry within the copied block
+    
+    ; --- payload / harassment ---
+    bomb    DAT.F   #0,     #0         ; simple DAT bomb
+    
+    ; --- template that gets copied (len instructions starting here) ---
+    template MOV.I  0,      1          ; tiny imp-like mover
+            SPL.B   2,      0          ; add a little process spread in the clone
+            ADD.AB  #3,     -2         ; perturb the mover's target (makes it "waltz")
+            JMP.B   -3,     0          ; loop
+            DAT.F   #0,     #0         ; padding / decoy
+            DAT.F   #0,     #0         ; padding / decoy
+            DAT.F   #0,     #0         ; padding / decoy
+            DAT.F   #0,     #0         ; padding / decoy
+            DAT.F   #0,     #0         ; padding / decoy
+            DAT.F   #0,     #0         ; padding / decoy
+            DAT.F   #0,     #0         ; padding / decoy
+            DAT.F   #0,     #0         ; padding / decoy
+    
+            END
+    ```
+  warrior.name: prism waltz
+  warrior.author: assistant
+  warrior.start: 0
+  warrior.instructions: (26)
+    [0] SPL.B  $     1, $     0
+    [1] MOV.AB #   233, $     9
+    [2] MOV.AB #    12, $     9
+    [3] MOV.I  @     6, @     7
+    [4] ADD.AB #     1, $     5
+    [5] ADD.AB #     1, $     5
+    [6] DJN.B  $    -3, $     5
+    [7] MOV.I  $     6, @     3
+    [8] JMP.B  @     4, $     0
+    [9] DAT.F  $     0, #     5
+    [10] DAT.F  $     0, #     0
+    [11] DAT.F  $     0, #     0
+    [12] DAT.F  $     0, #     2
+    [13] DAT.F  #     0, #     0
+    [14] MOV.I  $     0, $     1
+    [15] SPL.B  $     2, $     0
+    [16] ADD.AB #     3, $    -2
+    [17] JMP.B  $    -3, $     0
+    [18] DAT.F  #     0, #     0
+    [19] DAT.F  #     0, #     0
+    [20] DAT.F  #     0, #     0
+    [21] DAT.F  #     0, #     0
+    [22] DAT.F  #     0, #     0
+    [23] DAT.F  #     0, #     0
+    [24] DAT.F  #     0, #     0
+    [25] DAT.F  #     0, #     0
+
+  --- Warrior 0.2 ---
+  id: 60dcc039e0c9ab67bd7cd5e526b3a248883a9f3dd9dce57aa45b240487c65591
+  parent_id: None
+  fitness: -inf
+  bc: None
+  error: name 'sweep' is not defined
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode-94
+    ;name          Prism Weave
+    ;author        assistant
+    ;strategy      Hybrid "silk" replicator + scanning core-clear.
+    ;strategy      1) Quick SPL-based replication (silk-style) to survive early hits.
+    ;strategy      2) Each copy runs a lightweight scanner that, on a hit, launches
+    ;strategy         a SPL/DAT core-clear (process flood + gate) to finish opponents.
+    
+            ORG     start
+    
+    step    EQU     23              ; scan stride (co-prime-ish for typical cores)
+    gap     EQU     200             ; spacing used for replication
+    gateo   EQU     -4              ; offset from clear loop to gate location
+    
+    ; --- Replication (silk-ish) ---
+    start   spl     copy,   #0      ; create a second process to start copying
+            spl     scan,   #0      ; and another to begin scanning early
+            jmp     scan,   #0      ; original process joins scanning
+    
+    copy    mov.i   {src,   <dst    ; copy one instruction (predec pointers)
+            djn     copy,   #clen   ; repeat for program length
+            jmp     scan,   #0      ; new copy begins scanning
+    
+    src     dat.f   #0,     #0      ; A-field used as a predecrement source pointer
+    dst     dat.f   #gap,   #gap    ; B-field used as a predecrement destination pointer
+    
+    ; --- Scanner: looks for non-zero instructions and triggers clear on hit ---
+    scan    add.ab  #step,  ptr     ; advance probe pointer
+    ptr     sne.i   *0,     @0      ; compare two nearby cells (quick "activity" test)
+            jmz     scan,   @ptr    ; if probe looks empty/consistent, keep scanning
+            jmp     launch, #0      ; otherwise, likely found enemy -> clear
+    
+    ; --- Clear: SPL/DAT sweep with a simple gate ---
+    launch  mov.i   bomb,   @ptr    ; drop a bomb at/near the suspected enemy
+            spl     clear,  #0      ; start the clear in a new process
+            jmp     clear,  #0
+    
+    bomb    dat.f   #0,     #0      ; DAT bomb (kills processes that execute it)
+    
+    clear   mov.i   bomb,   >sweep  ; overwrite forward through core
+            mov.i   bomb,   >sweep  ; faster wipe (two writes per cycle)
+    gate    djn.f   clear,  {sweep  ; gate: predecrement pointer, keep looping
+    
+    sweep   dat.f   #gateo,  #gateo ; sweep pointer + gate anchor
+    
+    ; --- Program length constant for copier ---
+    clen    EQU     (sweep-start+1)
+    
+            END
+    ```
+
+  --- Warrior 0.3 ---
+  id: 229838229e3cc2991e438932082080c882fa30f158ee256d5017028a977c8bd3
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          kaleidoscope gate
+    ;author        chatgpt
+    ;strategy      A small "stone + gate" that:
+    ;strategy      1) walks a bombing pointer around core with a changing stride
+    ;strategy      2) lays SPL/DAT bombs to slow/kill opponents
+    ;strategy      3) keeps a simple self-protecting gate to reduce imps/linear hits
+    
+            ORG     start
+    
+    step    EQU     197             ; odd stride (good dispersion in many cores)
+    hop     EQU     13              ; small extra drift to "kaleidoscope" the pattern
+    
+    ptr     DAT.F   #0,     #0      ; B-field holds current target offset
+    stride  DAT.F   #0,     #step   ; B-field holds current stride (mutated slowly)
+    bomb    SPL.B   #0,     <0      ; SPL bomb: creates extra processes that run into trouble
+    kill    DAT.F   #0,     #0      ; DAT bomb: outright kill when executed
+    gate    DAT.F   #0,     #-12    ; gate value used to form a small imp-gate region
+    
+    start   MOV.I   bomb,   @ptr    ; drop SPL bomb at target
+            MOV.I   kill,   *ptr    ; drop DAT bomb nearby using A-indirect for variation
+            ADD.B   stride, ptr     ; advance pointer by current stride
+            ADD.B   #hop,   ptr     ; add a small drift so pattern doesn't stay perfectly periodic
+            SUB.B   #1,     stride  ; slowly change the stride over time (kaleidoscope effect)
+            MOV.I   gate,   <ptr    ; lay a tiny gate just ahead of where we're bombing
+            JMZ.B   start,  stride  ; if stride B hits 0, fall through to reset
+    reset   MOV.B   #step,  stride  ; reset stride to initial value
+            JMP     start           ; loop forever
+    
+            END
+    ```
+  warrior.name: kaleidoscope gate
+  warrior.author: chatgpt
+  warrior.start: 5
+  warrior.instructions: (14)
+    [0] DAT.F  #     0, #     0
+    [1] DAT.F  #     0, #   197
+    [2] SPL.B  #     0, <     0
+    [3] DAT.F  #     0, #     0
+    [4] DAT.F  #     0, #   -12
+    [5] MOV.I  $    -3, @    -5
+    [6] MOV.I  $    -3, *    -6
+    [7] ADD.B  $    -6, $    -7
+    [8] ADD.B  #    13, $    -8
+    [9] SUB.B  #     1, $    -8
+    [10] MOV.I  $    -6, <   -10
+    [11] JMZ.B  $    -6, $   -10
+    [12] MOV.B  #   197, $   -11
+    [13] JMP.B  $    -8, $     0
+
+  --- Warrior 0.4 ---
+  id: c8013b100af9e2c02e810fd9eb22c8fbe660190badd3c343d707e097a63a49c4
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Echo Orchard
+    ;author        assistant
+    ;strategy      A small "garden" warrior:
+    ;strategy      - Boots into a safer area
+    ;strategy      - Grows a ring of SPL "vines" (process stunners) outward
+    ;strategy      - Trails DAT bombs behind the growth to punish pursuers
+    ;strategy      The SPL ring tries to flood opponents with extra processes;
+    ;strategy      the DAT trail can kill anything that steps on it.
+    
+            ORG     start
+    
+    step    EQU     37              ; growth spacing (co-prime-ish to many cores)
+    bootd   EQU     400             ; boot distance
+    
+    ; --- boot block: copy core of program to a distant location, then jump there
+    start   mov.i   {src,   {dst    ; copy 1
+            mov.i   {src,   {dst    ; copy 2
+            mov.i   {src,   {dst    ; copy 3
+            mov.i   {src,   {dst    ; copy 4
+            mov.i   {src,   {dst    ; copy 5
+            mov.i   {src,   {dst    ; copy 6
+            mov.i   {src,   {dst    ; copy 7
+            mov.i   {src,   {dst    ; copy 8
+            jmp     boot,   0       ; run the booted copy
+    
+    src     dat.f   #boot+8, #boot  ; predecrement source pointer (A-field used)
+    dst     dat.f   #boot+8+bootd, #boot+bootd
+    
+    ; --- main (booted) body: SPL-ring grower + DAT trail
+    boot    add.ab  #step,  ptr     ; advance target pointer
+            spl     @ptr,   0       ; "vine": create process at target (stuns/clogs)
+            mov.i   bomb,   <ptr    ; trail a DAT bomb just behind the growth
+            jmp     boot,   0       ; keep growing
+    
+    ptr     dat.f   #0,     #0      ; pointer cell (B-field used by @ and <)
+    bomb    dat.f   #0,     #0      ; simple lethal bomb
+    
+            END
+    ```
+  warrior.name: Echo Orchard
+  warrior.author: assistant
+  warrior.start: 0
+  warrior.instructions: (17)
+    [0] MOV.I  {     9, {    10
+    [1] MOV.I  {     8, {     9
+    [2] MOV.I  {     7, {     8
+    [3] MOV.I  {     6, {     7
+    [4] MOV.I  {     5, {     6
+    [5] MOV.I  {     4, {     5
+    [6] MOV.I  {     3, {     4
+    [7] MOV.I  {     2, {     3
+    [8] JMP.B  $     3, $     0
+    [9] DAT.F  #    10, #     2
+    [10] DAT.F  #   409, #   401
+    [11] ADD.AB #    37, $     4
+    [12] SPL.B  @     3, $     0
+    [13] MOV.I  $     3, <     2
+    [14] JMP.B  $    -3, $     0
+    [15] DAT.F  #     0, #     0
+    [16] DAT.F  #     0, #     0
+
+  --- Warrior 0.5 ---
+  id: 3f551cce62a715cc1a9b519fb6668f275fb9939a7582fff43cc30b068998ea50
+  parent_id: None
+  fitness: -inf
+  bc: None
+  error: name 'tail' is not defined
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Mirror Moth
+    ;author        ChatGPT
+    ;strategy      Hybrid "scanner + mirror-paper":
+    ;strategy      1) A quick SPL-based scan looks for non-empty core nearby.
+    ;strategy      2) When something is found, it drops a small core-clear bomb.
+    ;strategy      3) In parallel, it replicates a compact copy of itself to a new spot.
+    ;strategy      The replication "mirror" helps survive while the scan+clear harasses opponents.
+    
+            ORG     start
+    
+    step    EQU     19              ; scan stride (co-prime-ish to many CORESIZE values)
+    gap     EQU     120             ; replication distance (arbitrary, keeps copies apart)
+    
+    ; ---- main entry ----
+    start   SPL.B   paper,     #0   ; run replicator in parallel
+    scan    ADD.AB  #step,     ptr   ; advance scan pointer
+            SNE.I   @ptr,      zero  ; found something not DAT 0,0?
+            JMP.B   scan,      #0
+    hit     MOV.I   bomb,      @ptr  ; drop a clear-style bomb at target
+            MOV.I   bomb,      <ptr  ; and one just before (slightly wider net)
+            JMP.B   scan,      #0
+    
+    ; ---- scanning pointer and constants ----
+    ptr     DAT.F   #0,        #40   ; B-field is the moving scan offset
+    zero    DAT.F   #0,        #0
+    bomb    SPL.B   #0,        >-1   ; SPL bomb with postincrement pointer (stirs enemy processes)
+    
+    ; ---- "mirror-paper" replicator ----
+    ; Copies a small block of code (from paper..tail) to a new location, then jumps there.
+    paper   MOV.I   {src,      <dst  ; copy one instruction (predecrement both pointers)
+            DJN.B   paper,     #copies
+            JMP.B   @dst,      #0    ; jump to the freshly made copy
+    
+    src     DAT.F   #0,        #tail-paper+1   ; source pointer (B counts down through block)
+    dst     DAT.F   #0,        #gap            ; destination pointer (B is base offset)
+    copies  EQU     (tail-paper+1)
+    
+    ; The replicated block includes scan/hit logic as well (since it's within paper..tail).
+    tail    DAT.F   #0,        #0
+    
+            END
+    ```
+
+  --- Warrior 0.6 ---
+  id: 4ffbb7df8ec935c3a6f17348ba64fed55fa49d75550f415f6eee5c9da1bbe5e5
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Mirror Maze
+    ;author        ChatGPT
+    ;strategy      A small "vamp + core-clear" warrior.
+    ;strategy      1) Lays a JMP "fang" at regular intervals (a vamp net).
+    ;strategy      2) Victims that execute a fang are redirected into a pit.
+    ;strategy      3) The pit SPLs to create extra processes, then is wiped by a clear.
+    ;strategy      Designed to be compact and a bit sneaky, not a pure speed demon.
+    
+            ORG     start
+    
+    step    EQU     97              ; relatively prime-ish stride for scattering
+    
+    ; --- Bombs / components ---
+    fang    JMP.B   pit,     0       ; the "tooth": whoever executes it jumps to pit
+    sbomb   SPL.B   #0,      #0      ; process-splitting bomb to slow opponents
+    dbomb   DAT.F   #0,      #0      ; simple kill for the core-clear
+    
+    ; --- Pointers / state ---
+    ptr     DAT.F   #0,      #0      ; B-field will walk through core by 'step'
+    cptr    DAT.F   #0,      #0      ; pointer used by the clear (B-field walks)
+    
+    ; --- Main loop: build a vamp net, occasionally drop SPL bombs too ---
+    start   ADD.AB  #step,   ptr     ; advance pointer
+            MOV.I   fang,    @ptr    ; plant a fang (JMP pit) via B-indirect
+            MOV.I   sbomb,   *ptr    ; also splash a SPL bomb nearby via A-indirect
+            JMN.B   start,   ptr     ; keep looping forever (ptr.B will never be 0)
+    
+    ; --- Pit: where fanged victims land ---
+    pit     SPL.B   pit+1,   #0      ; multiply processes (harmless to us, nasty to them)
+            JMP.B   wipe,    #0      ; funnel everything into the wipe/clear
+    
+    ; --- Core clear: sweep forward and overwrite with DAT ---
+    wipe    MOV.I   dbomb,   >cptr   ; postincrement pointer and lay DAT
+            JMP.B   wipe,    #0      ; keep clearing until killed or sole survivor
+    
+            END
+    ```
+  warrior.name: Mirror Maze
+  warrior.author: ChatGPT
+  warrior.start: 5
+  warrior.instructions: (13)
+    [0] JMP.B  $     9, $     0
+    [1] SPL.B  #     0, #     0
+    [2] DAT.F  #     0, #     0
+    [3] DAT.F  #     0, #     0
+    [4] DAT.F  #     0, #     0
+    [5] ADD.AB #    97, $    -2
+    [6] MOV.I  $    -6, @    -3
+    [7] MOV.I  $    -6, *    -4
+    [8] JMN.B  $    -3, $    -5
+    [9] SPL.B  $     1, #     0
+    [10] JMP.B  $     1, #     0
+    [11] MOV.I  $    -9, >    -7
+    [12] JMP.B  $    -1, #     0
+
+  --- Warrior 0.7 ---
+  id: 04e5521e41f47552070b186879fdc169570e77419fb0cb22b5996a6986c183ca
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          mirror garden
+    ;author        chatgpt
+    ;strategy      A "reflective garden" that grows a ring of imps while
+    ;              scattering decoy copies of itself (mirrors). The imps
+    ;              provide steady survival; the mirrors increase the chance
+    ;              opponents waste time attacking the wrong spot.
+    
+            ORG     start
+    
+    ; --- constants (chosen to be relatively "awkward" with many coresizes) ---
+    step    EQU     2667            ; classic imp step for CORESIZE 8000, still usable elsewhere
+    gap     EQU     97              ; spacing between mirror patches
+    count   EQU     12              ; how many mirror patches to plant
+    
+    ; --- templates ---
+    imp     MOV.I   0,      step    ; simple imp instruction to be copied into a ring
+    bomb    DAT.F   #0,     #0      ; simple DAT bomb (also used as harmless filler)
+    
+    ; --- main ---
+    start   SPL     spinner         ; split: one process begins planting mirrors
+            JMP     forge           ; main process goes forge the imp ring
+    
+    ; --- mirror planter: copies a small "patch" elsewhere repeatedly ---
+    ; patch = [bomb, imp, bomb, JMP back into patch] (a tiny self-contained decoy)
+    spinner MOV.I   bomb,   @dst    ; place bomb at destination
+            MOV.I   imp,    @dst    ; place an imp instruction right after
+            MOV.I   bomb,   @dst    ; another filler/bomb
+            MOV.I   back,   @dst    ; jump that keeps the decoy looping locally
+            ADD.AB  #gap,   dst     ; advance destination pointer by gap
+            DJN.B   spinner,#count  ; repeat count times
+            JMP     spinner         ; keep drifting/refreshing mirrors forever
+    
+    ; destination pointer for @dst (B-indirect). Starts a bit away from us.
+    dst     DAT.F   #0,     #400
+    
+    ; this instruction is copied as part of the patch; it jumps within the patch.
+    back    JMP.A   -3,     #0
+    
+    ; --- imp forge: lays down several imps then releases them ---
+    forge   MOV.I   imp,    1       ; drop an imp in front of us
+            MOV.I   imp,    1       ; and another (multiple starters help against traps)
+            MOV.I   imp,    1
+            SPL     2               ; create extra processes to enter the ring
+            JMP     imp             ; jump into the imp instruction stream
+    
+            END
+    ```
+  warrior.name: mirror garden
+  warrior.author: chatgpt
+  warrior.start: 2
+  warrior.instructions: (18)
+    [0] MOV.I  $     0, $  2667
+    [1] DAT.F  #     0, #     0
+    [2] SPL.B  $     2, $     0
+    [3] JMP.B  $    10, $     0
+    [4] MOV.I  $    -3, @     7
+    [5] MOV.I  $    -5, @     6
+    [6] MOV.I  $    -5, @     5
+    [7] MOV.I  $     5, @     4
+    [8] ADD.AB #    97, $     3
+    [9] DJN.B  $    -5, #    12
+    [10] JMP.B  $    -6, $     0
+    [11] DAT.F  #     0, #   400
+    [12] JMP.A  $    -3, #     0
+    [13] MOV.I  $   -13, $     1
+    [14] MOV.I  $   -14, $     1
+    [15] MOV.I  $   -15, $     1
+    [16] SPL.B  $     2, $     0
+    [17] JMP.B  $   -17, $     0
+
+Gen 3 (mutate_warrior): 1 warriors
+
+  --- Warrior 0.0 ---
+  id: 5e60d637e4f0dbd3346e31cdf5a7921a47e6a1363f437edc5bffd0b6f121ddc7
+  parent_id: 04e5521e41f47552070b186879fdc169570e77419fb0cb22b5996a6986c183ca
+  fitness: -inf
+  bc: None
+  prompt:
+    Mutate (change) the following Core War program in a way that is likely to improve its performance (survive and kill other programs). Write only the new updated program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    
+    
+    ```redcode
+    ;redcode
+    ;name          mirror garden
+    ;author        chatgpt
+    ;strategy      A "reflective garden" that grows a ring of imps while
+    ;              scattering decoy copies of itself (mirrors). The imps
+    ;              provide steady survival; the mirrors increase the chance
+    ;              opponents waste time attacking the wrong spot.
+    
+            ORG     start
+    
+    ; --- constants (chosen to be relatively "awkward" with many coresizes) ---
+    step    EQU     2667            ; classic imp step for CORESIZE 8000, still usable elsewhere
+    gap     EQU     97              ; spacing between mirror patches
+    count   EQU     12              ; how many mirror patches to plant
+    
+    ; --- templates ---
+    imp     MOV.I   0,      step    ; simple imp instruction to be copied into a ring
+    bomb    DAT.F   #0,     #0      ; simple DAT bomb (also used as harmless filler)
+    
+    ; --- main ---
+    start   SPL     spinner         ; split: one process begins planting mirrors
+            JMP     forge           ; main process goes forge the imp ring
+    
+    ; --- mirror planter: copies a small "patch" elsewhere repeatedly ---
+    ; patch = [bomb, imp, bomb, JMP back into patch] (a tiny self-contained decoy)
+    spinner MOV.I   bomb,   @dst    ; place bomb at destination
+            MOV.I   imp,    @dst    ; place an imp instruction right after
+            MOV.I   bomb,   @dst    ; another filler/bomb
+            MOV.I   back,   @dst    ; jump that keeps the decoy looping locally
+            ADD.AB  #gap,   dst     ; advance destination pointer by gap
+            DJN.B   spinner,#count  ; repeat count times
+            JMP     spinner         ; keep drifting/refreshing mirrors forever
+    
+    ; destination pointer for @dst (B-indirect). Starts a bit away from us.
+    dst     DAT.F   #0,     #400
+    
+    ; this instruction is copied as part of the patch; it jumps within the patch.
+    back    JMP.A   -3,     #0
+    
+    ; --- imp forge: lays down several imps then releases them ---
+    forge   MOV.I   imp,    1       ; drop an imp in front of us
+            MOV.I   imp,    1       ; and another (multiple starters help against traps)
+            MOV.I   imp,    1
+            SPL     2               ; create extra processes to enter the ring
+            JMP     imp             ; jump into the imp instruction stream
+    
+            END
+    ```
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          mirror garden (mutated)
+    ;author        chatgpt
+    ;strategy      Faster, more dangerous hybrid:
+    ;              - Quick imp launch (3-process imp ring) for survival
+    ;              - Mirror planter now drops a small JMP/IMP/DAT decoy patch
+    ;                but also sprays a lightweight DAT bomb linearly to disrupt scanners
+    ;              - Uses a fixed direct pointer (dst) so the planting is consistent and fast
+    
+            ORG     start
+    
+    ; --- constants ---
+    step    EQU     2667            ; classic 8000-core imp step
+    gap     EQU     97              ; spacing between mirror patches
+    count   EQU     16              ; plant more mirrors (better coverage)
+    bstep   EQU     23              ; bombing stride (awkward for many scanners)
+    
+    ; --- templates ---
+    imp     MOV.I   0,      step    ; imp for ring
+    dbomb   DAT.F   #0,     #0      ; simple DAT bomb
+    
+    ; --- main ---
+    start   SPL     planter         ; one process plants/bombs
+            JMP     forge           ; one process launches imps quickly
+    
+    ; --- planter/bomber ---
+    ; Plant a 4-instruction decoy patch at @dst, then advance.
+    ; Also lays a DAT bomb at >bptr each loop to interfere with scanners.
+    planter MOV.I   dbomb,  >bptr   ; spray DAT bombs with postincrement pointer
+            MOV.I   dbomb,  @dst    ; patch[0] = DAT
+            MOV.I   imp,    @dst    ; patch[1] = IMP (looks tempting / can waste enemy time)
+            MOV.I   jback,  @dst    ; patch[2] = JMP back into patch to keep it "alive"
+            MOV.I   dbomb,  @dst    ; patch[3] = DAT (breaks linear overwrites a bit)
+            ADD.AB  #gap,   dst     ; move to next mirror site
+            ADD.AB  #bstep, bptr    ; advance bomber stride too (keeps it irregular)
+            DJN.B   planter,#count  ; plant a batch of mirrors/bombs
+    loop    JMP     planter         ; keep pressure on forever
+    
+    ; Pointers (B-indirect for @dst, postinc for >bptr)
+    dst     DAT.F   #0,     #400
+    bptr    DAT.F   #0,     #900
+    
+    ; Copied into the patch: from inside the patch, -1 jumps to the IMP line.
+    jback   JMP.A   -1,     #0
+    
+    ; --- imp forge (quick 3-process launch into the ring) ---
+    forge   MOV.I   imp,    1       ; lay down a short runway
+            MOV.I   imp,    1
+            SPL     2               ; create extra processes
+            JMP     imp             ; enter the imp stream (forms the ring via step)
+    
+            END
+    ```
+  warrior.name: mirror garden (mutated)
+  warrior.author: chatgpt
+  warrior.start: 2
+  warrior.instructions: (20)
+    [0] MOV.I  $     0, $  2667
+    [1] DAT.F  #     0, #     0
+    [2] SPL.B  $     2, $     0
+    [3] JMP.B  $    13, $     0
+    [4] MOV.I  $    -3, >    10
+    [5] MOV.I  $    -4, @     8
+    [6] MOV.I  $    -6, @     7
+    [7] MOV.I  $     8, @     6
+    [8] MOV.I  $    -7, @     5
+    [9] ADD.AB #    97, $     4
+    [10] ADD.AB #    23, $     4
+    [11] DJN.B  $    -7, #    16
+    [12] JMP.B  $    -8, $     0
+    [13] DAT.F  #     0, #   400
+    [14] DAT.F  #     0, #   900
+    [15] JMP.A  $    -1, #     0
+    [16] MOV.I  $   -16, $     1
+    [17] MOV.I  $   -17, $     1
+    [18] SPL.B  $     2, $     0
+    [19] JMP.B  $   -19, $     0
+
+Gen 4 (new_warrior): 8 warriors
+
+  --- Warrior 0.0 ---
+  id: ff04089bffd38f5107fbd442c27832b7a874957011bf6bb354a8a8e6abfa1261
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Echo Garden
+    ;author        ChatGPT
+    ;strategy      A small "garden" of processes that plants a moving SPL/JMP trap
+    ;strategy      while a tiny imp trail follows behind. The trap is copied outward
+    ;strategy      by a pair of post-increment pointers; meanwhile extra processes
+    ;strategy      increase the chance that opponents run into the garden.
+    
+            ORG     start
+    
+    step    EQU     197
+    
+    ; --- Boot / setup -----------------------------------------------------------
+    
+    start   spl     imp+1                  ; launch an imp process
+            spl     planter                ; launch the trap planter
+            spl     planter                ; more planters = more coverage
+            jmp     imp                    ; main thread becomes an imp too
+    
+    ; --- Trap planter -----------------------------------------------------------
+    ; Copies the two-instruction "trap" outward using two post-increment pointers.
+    ; The trap is a SPL that points at a JMP -1 (a tight loop), causing victims to
+    ; get stuck burning cycles (and often processes) in place.
+    
+    planter mov.i   trap,    >ptr          ; drop first instruction of trap
+            mov.i   trap+1,  >ptr          ; drop second instruction of trap
+            add.ab  #step,   ptr           ; advance pointer in larger jumps
+            jmp     planter
+    
+    ptr     dat.f   #0,      #400          ; B-field is the moving target pointer
+    
+    trap    spl     #0,      #0            ; harmless-looking, but creates new proc
+            jmp     -1,      #0            ; loops forever where it lands
+    
+    ; --- Imp trail --------------------------------------------------------------
+    ; A small imp ring-ish trail: each process just copies itself forward by 1.
+    
+    imp     mov.i   0,       1
+            end
+    ```
+  warrior.name: Echo Garden
+  warrior.author: ChatGPT
+  warrior.start: 0
+  warrior.instructions: (12)
+    [0] SPL.B  $    12, $     0
+    [1] SPL.B  $     3, $     0
+    [2] SPL.B  $     2, $     0
+    [3] JMP.B  $     8, $     0
+    [4] MOV.I  $     5, >     4
+    [5] MOV.I  $     5, >     3
+    [6] ADD.AB #   197, $     2
+    [7] JMP.B  $    -3, $     0
+    [8] DAT.F  #     0, #   400
+    [9] SPL.B  #     0, #     0
+    [10] JMP.B  $    -1, #     0
+    [11] MOV.I  $     0, $     1
+
+  --- Warrior 0.1 ---
+  id: 2957d0e6b3449f3e549de582284c9508417f4fa88a77396cdfda1e40c2596c3d
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Pinwheel Garden
+    ;author        chatgpt
+    ;strategy      Hybrid: a tiny self-splitting imp spiral plus a slow, scattered
+    ;strategy      "garden" of bombs laid with a postincrementing pointer.
+    ;strategy      The bomber runs in one process while the spiral multiplies.
+    
+            ORG     start
+    
+    step    EQU     2667            ; imp step (works well in 8000-size cores)
+    
+    ; --- bootstrap / setup ---
+    start   SPL.B   impseed,    #0  ; launch the imp spiral in a new process
+            MOV.I   ptr,        scan ; initialize bomber pointer
+            JMP.B   scan,       #0   ; start bombing loop
+    
+    ; --- imp spiral (2-process) ---
+    impseed SPL.B   imp2,       #0   ; split to run two imps separated in core
+    imp1    MOV.I   0,          step ; classic imp
+    imp2    MOV.I   0,          step ; second imp
+    
+    ; --- bomber: "pinwheel garden" ---
+    ; ptr holds a B-pointer that advances via postincrement addressing (>).
+    ; We drop DAT bombs at a steadily-walking address pattern.
+    scan    MOV.I   bomb,       >ptr ; bomb at ptr, then increment ptr's B-field
+            ADD.AB  #17,        ptr  ; add a small twist so pattern isn't linear
+            SNE.I   safe,       @ptr ; avoid overwriting our own pointer block
+            ADD.AB  #97,        ptr  ; if too close to self, hop away
+            JMP.B   scan,       #0   ; continue forever
+    
+    ; --- data / bombs ---
+    bomb    DAT.F   #0,         #0   ; simple lethal bomb
+    safe    DAT.F   #0,         #0   ; comparison template (just "DAT 0,0")
+    ptr     DAT.F   #0,         #3500 ; starting offset for bombing
+    
+            END
+    ```
+  warrior.name: Pinwheel Garden
+  warrior.author: chatgpt
+  warrior.start: 0
+  warrior.instructions: (14)
+    [0] SPL.B  $     3, #     0
+    [1] MOV.I  $    12, $     5
+    [2] JMP.B  $     4, #     0
+    [3] SPL.B  $     2, #     0
+    [4] MOV.I  $     0, $  2667
+    [5] MOV.I  $     0, $  2667
+    [6] MOV.I  $     5, >     7
+    [7] ADD.AB #    17, $     6
+    [8] SNE.I  $     4, @     5
+    [9] ADD.AB #    97, $     4
+    [10] JMP.B  $    -4, #     0
+    [11] DAT.F  #     0, #     0
+    [12] DAT.F  #     0, #     0
+    [13] DAT.F  #     0, #  3500
+
+  --- Warrior 0.2 ---
+  id: 7ed1569d875bd27a8e9956eb41358b1cf6c13081eae4a80f570772e282395b6b
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Lanternfish
+    ;author        chatgpt
+    ;strategy      "Glow then bite": a quick scanner that plants a tiny imp ring,
+    ;strategy      and when it sees something non-empty it drops a small SPL/DAT
+    ;strategy      carpet around the hit to slow/kill processes.
+    
+            ORG     start
+    
+    step    EQU     17              ; scan stride (co-prime-ish for many cores)
+    gap     EQU     2667            ; imp spacing (classic 8000/3; still "creative" if different cores)
+    gate    EQU     20              ; distance for a simple process gate
+    
+    bomb    DAT.F   #0,     #0      ; lethal bomb
+    splb    SPL.B   #0,     {0      ; spl-bomb: creates extra processes then mutates nearby via predec
+    
+    ptr     DAT.F   #0,     #step   ; B-field holds scanning offset
+    imp     MOV.I   0,      1       ; the "lanternfish" imp
+    
+    start   SPL.B   build,  #0      ; fork: one builds an imp ring, one scans/attacks
+    
+    ; --- builder: lay down a small imp ring and then join the scan ---
+    build   MOV.I   imp,    ring    ; seed first imp
+            MOV.I   imp,    ring+gap ; second imp
+            MOV.I   imp,    ring+(gap*2) ; third imp (simple 3-point ring)
+            JMP.B   scan,   #0
+    
+    ; --- scanner: look for anything not equal to a known empty DAT bomb pattern ---
+    scan    ADD.B   #step,  ptr     ; advance scan pointer
+            SEQ.I   bomb,   @ptr    ; if target equals our DAT bomb, treat as empty
+            JMP.B   hit,    #0      ; otherwise: something interesting -> attack
+            JMP.B   scan,   #0
+    
+    ; --- attack: drop a small spl/dat "glow-bite" around the found location ---
+    hit     MOV.I   splb,   @ptr    ; spl-bomb at hit
+            MOV.I   bomb,   @ptr+1  ; DAT neighbor
+            MOV.I   bomb,   @ptr-1  ; DAT neighbor
+            MOV.I   splb,   @ptr+2  ; widen with more SPL
+            MOV.I   bomb,   @ptr-2  ; and more DAT
+            JMP.B   gatew,  #0
+    
+    ; --- gate: a tiny self-protecting process gate near our code, then resume scan ---
+    gatew   MOV.I   bomb,   gate+0  ; build a small DAT barrier
+            MOV.I   bomb,   gate+1
+            MOV.I   bomb,   gate+2
+            JMP.B   scan,   #0
+    
+    ; --- imp ring launch pad ---
+    ring    JMP.B   imp,    #0      ; start point for any surviving processes to enter the ring
+    
+            END
+    ```
+  warrior.name: Lanternfish
+  warrior.author: chatgpt
+  warrior.start: 4
+  warrior.instructions: (24)
+    [0] DAT.F  #     0, #     0
+    [1] SPL.B  #     0, {     0
+    [2] DAT.F  #     0, #    17
+    [3] MOV.I  $     0, $     1
+    [4] SPL.B  $     1, #     0
+    [5] MOV.I  $    -2, $    18
+    [6] MOV.I  $    -3, $  2684
+    [7] MOV.I  $    -4, $  5350
+    [8] JMP.B  $     1, #     0
+    [9] ADD.B  #    17, $    -7
+    [10] SEQ.I  $   -10, @    -8
+    [11] JMP.B  $     2, #     0
+    [12] JMP.B  $    -3, #     0
+    [13] MOV.I  $   -12, @   -11
+    [14] MOV.I  $   -14, @   -11
+    [15] MOV.I  $   -15, @   -14
+    [16] MOV.I  $   -15, @   -12
+    [17] MOV.I  $   -17, @   -17
+    [18] JMP.B  $     1, #     0
+    [19] MOV.I  $   -19, $    20
+    [20] MOV.I  $   -20, $    21
+    [21] MOV.I  $   -21, $    22
+    [22] JMP.B  $   -13, #     0
+    [23] JMP.B  $   -20, #     0
+
+  --- Warrior 0.3 ---
+  id: 3db7110b1ab6730cdb63ba896291d360923ce0c4f8183fed5d360159da7136b8
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Pinwheel Garden
+    ;author        ChatGPT
+    ;strategy      A small "garden" warrior:
+    ;strategy      - Boots a tiny core-clear away from the start (survivability)
+    ;strategy      - Runs a pinwheel scanner that drops SPL/DAT stun+kill bombs
+    ;strategy      - If an enemy is detected, it seeds a short clear to finish
+    
+            ORG     start
+    
+    step    EQU     98              ; scan stride (co-prime-ish to common coresizes)
+    
+    ; --- boot destination (far from start) ---
+    bdst    EQU     1200
+    
+    ; --- bombs ---
+    sbomb   DAT.F   #0,     #0       ; placeholder label for copy alignment
+    stun    SPL.B   #0,     #0       ; stun bomb (creates useless processes)
+    kill    DAT.F   #0,     #0       ; kill bomb (terminates processes)
+    
+    ; --- boot code: copy clear routine to bdst and jump there ---
+    start   MOV.I   clear,  bdst
+            MOV.I   clear+1,bdst+1
+            MOV.I   clear+2,bdst+2
+            MOV.I   clear+3,bdst+3
+            JMP.A   bdst
+    
+    ; --- pinwheel scanner + bomber (runs from original location) ---
+    ; It advances a pointer by 'step', checks for non-DAT-ish content, and bombs.
+    ; The bombs are a 2-cell pattern: SPL then DAT, to slow then kill.
+    scan    ADD.AB  #step,  ptr
+            SNE.I   @ptr,   kill      ; if target isn't already our kill bomb...
+            JMP.A   scan              ; ...keep spinning
+            MOV.I   stun,   @ptr      ; drop stun
+            MOV.I   kill,   @ptr+1    ; followed by kill
+            JMP.A   scan
+    
+    ptr     DAT.F   #0,     #200      ; B-field is scan offset "hand" (spins outward)
+    
+    ; --- relocated clear routine (booted to bdst) ---
+    ; A simple SPL/DAT carpet clear using postincrement to sweep core.
+    clear   MOV.I   kill,   >cptr
+            MOV.I   stun,   >cptr
+            DJN.B   clear,  #4000     ; long sweep (tuned for typical cores)
+            JMP.A   clear
+    
+    cptr    DAT.F   #0,     #300      ; sweep starting point
+    
+            END
+    ```
+  warrior.name: Pinwheel Garden
+  warrior.author: ChatGPT
+  warrior.start: 3
+  warrior.instructions: (20)
+    [0] DAT.F  #     0, #     0
+    [1] SPL.B  #     0, #     0
+    [2] DAT.F  #     0, #     0
+    [3] MOV.I  $    12, $  1200
+    [4] MOV.I  $    12, $  1201
+    [5] MOV.I  $    12, $  1202
+    [6] MOV.I  $    12, $  1203
+    [7] JMP.A  $  1200, $     0
+    [8] ADD.AB #    98, $     6
+    [9] SNE.I  @     5, $    -7
+    [10] JMP.A  $    -2, $     0
+    [11] MOV.I  $   -10, @     3
+    [12] MOV.I  $   -10, @     3
+    [13] JMP.A  $    -5, $     0
+    [14] DAT.F  #     0, #   200
+    [15] MOV.I  $   -13, >     4
+    [16] MOV.I  $   -15, >     3
+    [17] DJN.B  $    -2, #  4000
+    [18] JMP.A  $    -3, $     0
+    [19] DAT.F  #     0, #   300
+
+  --- Warrior 0.4 ---
+  id: d76bb43d420f7ea976083287c4e73a51766232a11bcc8d8124fba94cdf755419
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Midnight Spiral
+    ;author        assistant
+    ;strategy      A compact "spiral bomber" that:
+    ;strategy      1) Splits into two processes for resilience,
+    ;strategy      2) Walks a rotating set of offsets (a spiral-ish sweep),
+    ;strategy      3) Drops a small SPL/DAT trap to slow/kill opponents,
+    ;strategy      4) Keeps going indefinitely.
+    ;strategy
+    ;strategy      The "spiral" comes from repeatedly adding a changing step
+    ;strategy      to a pointer; the step itself changes each loop.
+    
+            ORG     start
+    
+    step    EQU     11                  ; base stride (relatively prime to many coresizes)
+    twist   EQU     7                   ; how much the stride changes each loop
+    
+    ptr     DAT.F   #0,     #0          ; B-field is our bombing pointer
+    delta   DAT.F   #0,     #step       ; B-field is our current step size
+    
+    ; A small two-word trap: SPL to create extra processes, then DAT to kill them.
+    trap    SPL.B   #0,     #0
+    kill    DAT.F   #0,     #0
+    
+    start   SPL.B   scan,   #0          ; run scan/bomb in parallel
+            JMP.B   scan,   #0          ; and again: two processes in the main loop
+    
+    scan    ADD.B   delta,  ptr         ; ptr.B += delta.B  (advance bombing address)
+            MOV.I   trap,   @ptr        ; write SPL trap at target
+            MOV.I   kill,   @ptr        ; follow with DAT for the trap to fall into
+            ADD.B   #twist, delta       ; delta.B += twist  (slowly changing stride)
+            JMZ.B   reset,  delta       ; if delta.B wraps to 0, fix it (avoid stalling)
+            JMP.B   scan,   #0
+    
+    reset   MOV.B   #step,  delta       ; restore a sane non-zero stride
+            JMP.B   scan,   #0
+    
+            END
+    ```
+  warrior.name: Midnight Spiral
+  warrior.author: assistant
+  warrior.start: 4
+  warrior.instructions: (14)
+    [0] DAT.F  #     0, #     0
+    [1] DAT.F  #     0, #    11
+    [2] SPL.B  #     0, #     0
+    [3] DAT.F  #     0, #     0
+    [4] SPL.B  $     2, #     0
+    [5] JMP.B  $     1, #     0
+    [6] ADD.B  $    -5, $    -6
+    [7] MOV.I  $    -5, @    -7
+    [8] MOV.I  $    -5, @    -8
+    [9] ADD.B  #     7, $    -8
+    [10] JMZ.B  $     2, $    -9
+    [11] JMP.B  $    -5, #     0
+    [12] MOV.B  #    11, $   -11
+    [13] JMP.B  $    -7, #     0
+
+  --- Warrior 0.5 ---
+  id: 45a9d048a198db74cb628dde7ce9e65696e661cf21e546537f6ac2560c6cab4c
+  parent_id: None
+  fitness: -inf
+  bc: None
+  error: name 'garden2' is not defined
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name Mirror Garden
+    ;author chatgpt
+    ;strategy A small "garden" that grows copies of itself outward while
+    ;strategy leaving a paper-thin trail of DAT bombs. Uses SPL to multiply
+    ;strategy processes and two mirrored copy streams to be harder to erase.
+    
+            ORG     start
+    
+    gap     EQU     23          ; spacing between planted copies
+    step    EQU     7           ; bomb stride
+    bptr    EQU     311         ; starting bomb offset (arbitrary, spreads quickly)
+    
+    ; --- bootstrap: split, then start copying the body forward and backward ---
+    start   SPL.B   1,      #0          ; create an extra process to start the garden
+            SPL.B   seed,   #0          ; another process begins seeding
+            JMP.B   copier, #0          ; main process becomes the copier
+    
+    ; --- seeding: drop DAT bombs while the copier runs ---
+    seed    ADD.AB  #step,  bombp       ; advance bombing pointer
+            MOV.I   bomb,   @bombp      ; plant a DAT bomb through B-indirection
+            JMP.B   seed,   #0          ; keep bombing
+    
+    bombp   DAT.F   #0,     #bptr       ; bombing pointer storage (B-field walks)
+    bomb    DAT.F   #0,     #0          ; the bomb (kills processes that execute it)
+    
+    ; --- copier: copy the whole "garden" to two locations (forward/backward) ---
+    ; copies from (src) through (src+len-1) into (dstf) and (dstb)
+    copier  MOV.I   <src,   <dstf       ; copy one instruction forward
+            MOV.I   <src2,  <dstb       ; and mirror-copy one instruction backward
+            DJN.B   copier, #len        ; repeat for 'len' instructions
+            SPL.B   launchf,#0          ; start the forward copy running
+            SPL.B   launchb,#0          ; start the backward copy running
+            JMP.B   seed,   #0          ; original process returns to bombing
+    
+    ; pointers for copying (predecrement gives a compact copy loop)
+    src     DAT.F   #0,     #(garden+len)        ; source end (forward stream)
+    dstf    DAT.F   #0,     #(garden+len+gap)    ; destination end forward
+    src2    DAT.F   #0,     #(garden2+len)       ; mirrored source end
+    dstb    DAT.F   #0,     #(garden2+len-gap)   ; destination end backward
+    
+    ; launchers jump into the new copies' start labels
+    launchf JMP.B   garden+gap,    #0
+    launchb JMP.B   garden2-gap,   #0
+    
+    ; --- the replicated body: tiny paper-like loop with a twist ---
+    ; two symmetric bodies so the copier can plant mirror images.
+    garden  SPL.B   2,      #0          ; multiply processes locally
+            MOV.I   bomb,   >bombp      ; smear bombs using postincrement
+            ADD.AB  #step,  bombp       ; keep the pointer moving
+            JMP.B   garden, #0          ; loop forever
+    
+    garden2 SPL.B   2,      #0
+            MOV.I   bomb,   <bombp      ; smear bombs in the opposite direction
+            SUB.AB  #step,  bombp
+            JMP.B   garden2,#0
+    
+    ; length of the copied block (must include both bodies and launchers/pointers)
+    len     EQU     (garden2 - copier + 4)
+    
+            END
+    ```
+
+  --- Warrior 0.6 ---
+  id: a78cf4fde45b6e568e24d2b3cf417f1a700dac2a029ffaa05d80f2c3a9962d48
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Mirror Garden
+    ;author        ChatGPT
+    ;strategy      A small "mirror" bomber:
+    ;strategy      - Boots a compact scanning loop away from the origin
+    ;strategy      - Uses SNE to detect non-empty core
+    ;strategy      - On a hit, drops a SPL/DAT pair ("vines") to entangle processes
+    ;strategy      - Keeps moving the probe forward to paint a garden of traps
+    
+            ORG     start
+    
+    step    EQU     97          ; probe spacing (relatively prime-ish to many CORESIZE values)
+    
+    start   mov.i   boot,      boot+200     ; copy boot template
+            mov.i   scan,      scan+200     ; copy scanner
+            mov.i   probe,     probe+200    ; copy probe pointer
+            jmp.a   scan+200               ; run from the booted copy
+    
+    ; --- booted code begins here (also exists at original for copying) ---
+    
+    boot    spl.a   1,         0            ; split once for a bit of resilience
+            jmp.a   scan,      0            ; enter scanning loop
+    
+    scan    sne.i   @probe,    blank        ; compare probed cell with an expected blank DAT
+            jmp.a   hit,       0            ; if different, likely enemy -> plant vines
+            add.ab  #step,     probe        ; advance probe
+            jmp.a   scan,      0            ; loop
+    
+    hit     mov.i   vine1,     @probe       ; overwrite target with SPL trap
+            add.ab  #1,        probe        ; adjacent cell...
+            mov.i   vine2,     @probe       ; ...gets DAT to kill/cripple
+            add.ab  #step-1,   probe        ; keep drifting forward (net +step)
+            jmp.a   scan,      0
+    
+    ; --- data / templates ---
+    
+    probe   dat.f   #0,        #400         ; B-field holds probe offset used by @probe
+    blank   dat.f   #0,        #0           ; what we "expect" empty core to look like
+    vine1   spl.a   0,         0            ; tie up processes at the hit location
+    vine2   dat.f   #0,        #0           ; finish them
+    
+            END
+    ```
+  warrior.name: Mirror Garden
+  warrior.author: ChatGPT
+  warrior.start: 0
+  warrior.instructions: (19)
+    [0] MOV.I  $     4, $   204
+    [1] MOV.I  $     5, $   205
+    [2] MOV.I  $    13, $   213
+    [3] JMP.A  $   203, $     0
+    [4] SPL.A  $     1, $     0
+    [5] JMP.A  $     1, $     0
+    [6] SNE.I  @     9, $    10
+    [7] JMP.A  $     3, $     0
+    [8] ADD.AB #    97, $     7
+    [9] JMP.A  $    -3, $     0
+    [10] MOV.I  $     7, @     5
+    [11] ADD.AB #     1, $     4
+    [12] MOV.I  $     6, @     3
+    [13] ADD.AB #    96, $     2
+    [14] JMP.A  $    -8, $     0
+    [15] DAT.F  #     0, #   400
+    [16] DAT.F  #     0, #     0
+    [17] SPL.A  $     0, $     0
+    [18] DAT.F  #     0, #     0
+
+  --- Warrior 0.7 ---
+  id: 754532bd2da96bddf20dc5f96a04329cceaa0f57ee8f227ead78a053e8f6f969
+  parent_id: None
+  fitness: -inf
+  bc: None
+  prompt:
+    Create a new valid Core War program in redcode. Be creative. Write only the new program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Mirage Garden
+    ;author        ChatGPT
+    ;strategy      A small "garden" that quickly grows into multiple processes,
+    ;strategy      lays a ring of decoy instructions around itself, then launches
+    ;strategy      two imps in opposite directions. The decoys try to waste enemy
+    ;strategy      scanners and misdirect simple bombers.
+    
+            ORG     start
+    
+    step    EQU     23          ; relatively prime to many common CORESIZE values
+    gap     EQU     97          ; spacing for decoy planting
+    
+    ; --- core data / pointers ---
+    ptr     DAT.F   #0,     #gap        ; B-field is the moving decoy pointer
+    seed    DAT.F   #step,  #step       ; used to advance ptr
+    
+    ; --- decoy instructions ---
+    dec1    MOV.I   <ptr,   >ptr        ; looks like a copier; also perturbs ptr cell
+    dec2    SNE.I   *ptr,   @ptr        ; noisy compare to confuse scanners
+    dec3    JMP.B   @ptr,   {ptr        ; indirect jump bait
+    
+    ; --- imp bodies (two directions) ---
+    impf    MOV.I   0,      1           ; forward imp
+    impb    MOV.I   0,     -1           ; backward imp
+    
+    ; --- bootstrap / main ---
+    start   SPL.B   1,      0           ; create a second process immediately
+    grow    SPL.B   plant,  0           ; dedicate one process to planting decoys
+            SPL.B   launch, 0           ; another process to launch imps
+    loop    ADD.F   seed,   ptr         ; advance the decoy pointer (both fields)
+            JMP.B   loop,   0           ; keep one process alive in a tight loop
+    
+    ; --- decoy planting process ---
+    plant   MOV.I   dec1,   @ptr        ; plant decoy 1 at moving target
+            ADD.AB  #1,     ptr         ; nudge pointer to change pattern
+            MOV.I   dec2,   @ptr        ; plant decoy 2
+            ADD.AB  #1,     ptr
+            MOV.I   dec3,   @ptr        ; plant decoy 3
+            ADD.F   seed,   ptr         ; jump ahead by step+gap mixture
+            JMP.B   plant,  0
+    
+    ; --- imp launching process ---
+    launch  SPL.B   impstart,0          ; start forward imp
+            JMP.B   impback, 0          ; current process becomes backward imp
+    
+    impstart JMP.B  impf,    0          ; enter forward imp loop
+    impback  JMP.B  impb,    0          ; enter backward imp loop
+    
+            END
+    ```
+  warrior.name: Mirage Garden
+  warrior.author: ChatGPT
+  warrior.start: 7
+  warrior.instructions: (23)
+    [0] DAT.F  #     0, #    97
+    [1] DAT.F  #    23, #    23
+    [2] MOV.I  <    -2, >    -2
+    [3] SNE.I  *    -3, @    -3
+    [4] JMP.B  @    -4, {    -4
+    [5] MOV.I  $     0, $     1
+    [6] MOV.I  $     0, $    -1
+    [7] SPL.B  $     1, $     0
+    [8] SPL.B  $     4, $     0
+    [9] SPL.B  $    10, $     0
+    [10] ADD.F  $    -9, $   -10
+    [11] JMP.B  $    -1, $     0
+    [12] MOV.I  $   -10, @   -12
+    [13] ADD.AB #     1, $   -13
+    [14] MOV.I  $   -11, @   -14
+    [15] ADD.AB #     1, $   -15
+    [16] MOV.I  $   -12, @   -16
+    [17] ADD.F  $   -16, $   -17
+    [18] JMP.B  $    -6, $     0
+    [19] SPL.B  $     2, $     0
+    [20] JMP.B  $     2, $     0
+    [21] JMP.B  $   -16, $     0
+    [22] JMP.B  $   -16, $     0
+
+Gen 5 (mutate_warrior): 1 warriors
+
+  --- Warrior 0.0 ---
+  id: 96d0d54788ff1ad433019970bb9f6f095647acce3b80e55fb7e9c6ed0d26b99f
+  parent_id: c8013b100af9e2c02e810fd9eb22c8fbe660190badd3c343d707e097a63a49c4
+  fitness: -inf
+  bc: None
+  prompt:
+    Mutate (change) the following Core War program in a way that is likely to improve its performance (survive and kill other programs). Write only the new updated program (with comments explaining what it does) and nothing else. ONLY DEFINE LABELS ON THE SAME LINE AS AN INSTRUCTION. Wrap program around ``` tags.
+    
+    
+    ```redcode
+    ;redcode
+    ;name          Echo Orchard
+    ;author        assistant
+    ;strategy      A small "garden" warrior:
+    ;strategy      - Boots into a safer area
+    ;strategy      - Grows a ring of SPL "vines" (process stunners) outward
+    ;strategy      - Trails DAT bombs behind the growth to punish pursuers
+    ;strategy      The SPL ring tries to flood opponents with extra processes;
+    ;strategy      the DAT trail can kill anything that steps on it.
+    
+            ORG     start
+    
+    step    EQU     37              ; growth spacing (co-prime-ish to many cores)
+    bootd   EQU     400             ; boot distance
+    
+    ; --- boot block: copy core of program to a distant location, then jump there
+    start   mov.i   {src,   {dst    ; copy 1
+            mov.i   {src,   {dst    ; copy 2
+            mov.i   {src,   {dst    ; copy 3
+            mov.i   {src,   {dst    ; copy 4
+            mov.i   {src,   {dst    ; copy 5
+            mov.i   {src,   {dst    ; copy 6
+            mov.i   {src,   {dst    ; copy 7
+            mov.i   {src,   {dst    ; copy 8
+            jmp     boot,   0       ; run the booted copy
+    
+    src     dat.f   #boot+8, #boot  ; predecrement source pointer (A-field used)
+    dst     dat.f   #boot+8+bootd, #boot+bootd
+    
+    ; --- main (booted) body: SPL-ring grower + DAT trail
+    boot    add.ab  #step,  ptr     ; advance target pointer
+            spl     @ptr,   0       ; "vine": create process at target (stuns/clogs)
+            mov.i   bomb,   <ptr    ; trail a DAT bomb just behind the growth
+            jmp     boot,   0       ; keep growing
+    
+    ptr     dat.f   #0,     #0      ; pointer cell (B-field used by @ and <)
+    bomb    dat.f   #0,     #0      ; simple lethal bomb
+    
+            END
+    ```
+  llm_response:
+    ```redcode
+    ;redcode
+    ;name          Echo Orchard (mutated)
+    ;author        assistant
+    ;strategy      Mutated into a fast boot + SPL/DAT "carpet" with better startup:
+    ;strategy      - Boots the working loop far away to reduce self-hits
+    ;strategy      - Uses a tighter, faster replication/boot sequence
+    ;strategy      - Lays a consistent DAT trail while spawning SPL vines to clog
+    ;strategy      - Step chosen to be relatively prime-ish to common core sizes
+    
+            ORG     start
+    
+    step    EQU     3039            ; classic core-walk step (good dispersion in 8000)
+    bootd   EQU     2000            ; safer boot distance
+    
+    ; --- quick boot: copy the active loop (from boot .. endcopy) to bootd, jump there
+    start   mov.i   boot,   boot+bootd      ; copy 1st instruction of loop
+            mov.i   boot+1, boot+1+bootd    ; copy 2
+            mov.i   boot+2, boot+2+bootd    ; copy 3
+            mov.i   boot+3, boot+3+bootd    ; copy 4
+            mov.i   boot+4, boot+4+bootd    ; copy 5 (includes pointer/bomb)
+            jmp     boot+bootd, 0           ; execute the booted copy
+    
+    ; --- main loop (runs only in booted copy)
+    boot    add.ab  #step,  ptr            ; advance pointer (B-field) through core
+            mov.i   bomb,   <ptr           ; drop DAT just behind current target
+            spl     @ptr,   0              ; spawn a "vine" at target (process clog)
+            jmp     boot,   0              ; keep sweeping
+    
+    ptr     dat.f   #0,     #0             ; pointer cell (B-field used by @ and <)
+    bomb    dat.f   #0,     #0             ; lethal bomb (kills on execution)
+    
+            END
+    ```
+  warrior.name: Echo Orchard (mutated)
+  warrior.author: assistant
+  warrior.start: 0
+  warrior.instructions: (12)
+    [0] MOV.I  $     6, $  2006
+    [1] MOV.I  $     6, $  2006
+    [2] MOV.I  $     6, $  2006
+    [3] MOV.I  $     6, $  2006
+    [4] MOV.I  $     6, $  2006
+    [5] JMP.B  $  2001, $     0
+    [6] ADD.AB #  3039, $     4
+    [7] MOV.I  $     4, <     3
+    [8] SPL.B  @     2, $     0
+    [9] JMP.B  $    -3, $     0
+    [10] DAT.F  #     0, #     0
+    [11] DAT.F  #     0, #     0

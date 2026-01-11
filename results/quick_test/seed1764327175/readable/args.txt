@@ -1,0 +1,34 @@
+[Args]
+
+seed: 1764327175
+save_dir: /home/burny/projects/ml-playground/LLM-Digital-Red-Queen-Adversarial-Program-Evolution-in-Core-War/results/quick_test/seed1764327175
+n_processes: 20
+resume: True
+job_timeout: 86400
+simargs:
+  rounds: 20
+  size: 8000
+  cycles: 80000
+  processes: 8000
+  length: 100
+  distance: 100
+timeout: 900
+initial_opps: ['/home/burny/projects/ml-playground/LLM-Digital-Red-Queen-Adversarial-Program-Evolution-in-Core-War/human_warriors/imp.red']
+n_rounds: 3
+n_iters: 20
+log_every: 5
+last_k_opps: 3
+sample_new_percent: 0.1
+bc_axes: tsp,mc
+warmup_with_init_opps: True
+warmup_with_past_champs: True
+n_init: 8
+n_mutate: 1
+fitness_threshold: 0.8
+single_cell: False
+gpt_model: gpt-5.2
+temperature: 1.0
+reasoning_effort: None
+system_prompt: ./prompts/system_prompt_0.txt
+new_prompt: ./prompts/new_prompt_0.txt
+mutate_prompt: ./prompts/mutate_prompt_0.txt

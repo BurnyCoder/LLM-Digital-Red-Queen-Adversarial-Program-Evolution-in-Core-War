@@ -1,0 +1,139 @@
+[Champions]
+
+
+--- round_000_champion.red ---
+;redcode
+;name          Windmill Garden
+;author        ChatGPT
+;strategy      A small hybrid: quick self-splitting "windmill" that lays a
+;strategy      rotating DAT bomb ring while leaving behind a tiny decoy trail.
+;strategy      Not a top-tier warrior, but it’s lively and valid ICWS'94 style.
+
+        ORG     start
+
+step    EQU     37          ; ring stride (co-prime-ish to common coresizes)
+gap     EQU     9           ; spacing used for decoy scribbles
+
+bomb    DAT.F   #0,     #0  ; the "petal": simple DAT bomb
+
+ptr     DAT.F   #0,     #0  ; bombing pointer (B-field used as offset)
+dptr    DAT.F   #0,     #0  ; decoy pointer (B-field used as offset)
+
+start   SPL.B   spinner, #0         ; spawn the windmill core
+        SPL.B   gardener, #0        ; spawn the ring-bomber
+        JMP.B   decoy,    #0        ; main thread goes paint decoys
+
+; --- Thread 1: the windmill spinner ---
+; Keeps two processes circling a tiny loop so the warrior doesn't collapse
+; immediately if one task gets hit.
+spinner SPL.B   2,        #0
+        JMP.B   spinner,  #0
+
+; --- Thread 2: the gardener (ring bomber) ---
+; Advances ptr by step and drops a DAT at @ptr (B-indirect through ptr).
+gardener ADD.AB  #step,    ptr
+        MOV.I    bomb,     @ptr
+        JMP.B    gardener, #0
+
+; --- Thread 3: decoy painter ---
+; Smears harmless MOV instructions in a spaced line to confuse simple scanners.
+decoy   ADD.AB  #gap,     dptr
+        MOV.I   dec,      @dptr
+        JMP.B   decoy,    #0
+
+dec     MOV.I   #0,       $0        ; harmless-ish "do nothing" copy-bait
+
+        END
+
+--- round_001_champion.red ---
+;redcode
+;name          Echo Orchard
+;author        assistant
+;strategy      A small "garden" warrior:
+;strategy      - Boots into a safer area
+;strategy      - Grows a ring of SPL "vines" (process stunners) outward
+;strategy      - Trails DAT bombs behind the growth to punish pursuers
+;strategy      The SPL ring tries to flood opponents with extra processes;
+;strategy      the DAT trail can kill anything that steps on it.
+
+        ORG     start
+
+step    EQU     37              ; growth spacing (co-prime-ish to many cores)
+bootd   EQU     400             ; boot distance
+
+; --- boot block: copy core of program to a distant location, then jump there
+start   mov.i   {src,   {dst    ; copy 1
+        mov.i   {src,   {dst    ; copy 2
+        mov.i   {src,   {dst    ; copy 3
+        mov.i   {src,   {dst    ; copy 4
+        mov.i   {src,   {dst    ; copy 5
+        mov.i   {src,   {dst    ; copy 6
+        mov.i   {src,   {dst    ; copy 7
+        mov.i   {src,   {dst    ; copy 8
+        jmp     boot,   0       ; run the booted copy
+
+src     dat.f   #boot+8, #boot  ; predecrement source pointer (A-field used)
+dst     dat.f   #boot+8+bootd, #boot+bootd
+
+; --- main (booted) body: SPL-ring grower + DAT trail
+boot    add.ab  #step,  ptr     ; advance target pointer
+        spl     @ptr,   0       ; "vine": create process at target (stuns/clogs)
+        mov.i   bomb,   <ptr    ; trail a DAT bomb just behind the growth
+        jmp     boot,   0       ; keep growing
+
+ptr     dat.f   #0,     #0      ; pointer cell (B-field used by @ and <)
+bomb    dat.f   #0,     #0      ; simple lethal bomb
+
+        END
+
+--- round_002_champion.red ---
+;redcode
+;name          Mirage Garden
+;author        ChatGPT
+;strategy      A small "garden" that quickly grows into multiple processes,
+;strategy      lays a ring of decoy instructions around itself, then launches
+;strategy      two imps in opposite directions. The decoys try to waste enemy
+;strategy      scanners and misdirect simple bombers.
+
+        ORG     start
+
+step    EQU     23          ; relatively prime to many common CORESIZE values
+gap     EQU     97          ; spacing for decoy planting
+
+; --- core data / pointers ---
+ptr     DAT.F   #0,     #gap        ; B-field is the moving decoy pointer
+seed    DAT.F   #step,  #step       ; used to advance ptr
+
+; --- decoy instructions ---
+dec1    MOV.I   <ptr,   >ptr        ; looks like a copier; also perturbs ptr cell
+dec2    SNE.I   *ptr,   @ptr        ; noisy compare to confuse scanners
+dec3    JMP.B   @ptr,   {ptr        ; indirect jump bait
+
+; --- imp bodies (two directions) ---
+impf    MOV.I   0,      1           ; forward imp
+impb    MOV.I   0,     -1           ; backward imp
+
+; --- bootstrap / main ---
+start   SPL.B   1,      0           ; create a second process immediately
+grow    SPL.B   plant,  0           ; dedicate one process to planting decoys
+        SPL.B   launch, 0           ; another process to launch imps
+loop    ADD.F   seed,   ptr         ; advance the decoy pointer (both fields)
+        JMP.B   loop,   0           ; keep one process alive in a tight loop
+
+; --- decoy planting process ---
+plant   MOV.I   dec1,   @ptr        ; plant decoy 1 at moving target
+        ADD.AB  #1,     ptr         ; nudge pointer to change pattern
+        MOV.I   dec2,   @ptr        ; plant decoy 2
+        ADD.AB  #1,     ptr
+        MOV.I   dec3,   @ptr        ; plant decoy 3
+        ADD.F   seed,   ptr         ; jump ahead by step+gap mixture
+        JMP.B   plant,  0
+
+; --- imp launching process ---
+launch  SPL.B   impstart,0          ; start forward imp
+        JMP.B   impback, 0          ; current process becomes backward imp
+
+impstart JMP.B  impf,    0          ; enter forward imp loop
+impback  JMP.B  impb,    0          ; enter backward imp loop
+
+        END
