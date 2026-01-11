@@ -22,6 +22,7 @@ Modes:
 """
 
 import argparse
+import random
 import subprocess
 import sys
 import os
@@ -542,7 +543,7 @@ def main():
     )
 
     # Common arguments
-    parser.add_argument("--seed", "-s", type=int, default=0, help="Random seed")
+    parser.add_argument("--seed", "-s", type=int, default=None, help="Random seed (default: random)")
     parser.add_argument("--n_processes", "-p", type=int, default=20, help="Number of parallel processes")
     parser.add_argument("--model", default=os.environ.get("DRQ_MODEL", "gpt-5-nano"), help="LLM model to use (env: DRQ_MODEL)")
     parser.add_argument("--temperature", type=float, default=1.0, help="LLM temperature")
@@ -566,6 +567,11 @@ def main():
     parser.add_argument("--skip_check", action="store_true", help="Skip setup verification")
 
     args = parser.parse_args()
+
+    # Generate random seed if not provided
+    if args.seed is None:
+        args.seed = random.randint(0, 2**31 - 1)
+        print(f"Using random seed: {args.seed}")
 
     # Verify setup
     if not args.skip_check:
