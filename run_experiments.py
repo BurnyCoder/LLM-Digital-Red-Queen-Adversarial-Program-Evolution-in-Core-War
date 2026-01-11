@@ -28,6 +28,9 @@ import sys
 import os
 import pickle
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 from glob import glob
 
 # Project root directory
